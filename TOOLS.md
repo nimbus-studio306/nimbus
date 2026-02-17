@@ -55,22 +55,18 @@ response = client.models.generate_content(
 
 ## Email
 
-### Gmail (5 accounts via gog)
-**USE `gog gmail` FOR ALL GMAIL OPERATIONS** — NOT gmail-search.js!
+### Gmail Access
+**NOTE:** `gog` CLI was documented but is NOT installed on this VM.
+Currently only papperpictures@gmail.com has OAuth2 access via `gmail-search.js`.
 
-Authenticated accounts:
-- papperpictures@gmail.com
+**TODO:** Set up multi-account Gmail access (5 accounts total):
+- papperpictures@gmail.com ✅ (oauth working)
 - urbandanceteam@gmail.com
 - studio306nl@gmail.com
 - funkin4holland@gmail.com
 - c3studios.nl@gmail.com
 
-Commands:
-```bash
-gog gmail search "query" --account papperpictures@gmail.com
-gog gmail messages get <id> --account urbandanceteam@gmail.com
-gog gmail messages modify <id> --add-labels STARRED --account studio306nl@gmail.com
-```
+For now, use `gmail-search.js` for papperpictures@gmail.com only.
 
 ### Sending (nimbus@studio306.nl via SMTP)
 - **Send email:** `node send-email.js <to> <subject> <bodyFile> [--cc <cc>] [--attach <file>...]`
