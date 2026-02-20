@@ -89,13 +89,14 @@ response = client.models.generate_content(
 ### Gmail Access
 **gog CLI is installed** at `/usr/local/bin/gog`
 - Use `gog gmail` for multi-account Gmail access
-- papperpictures@gmail.com ✅ (oauth working)
+- All 5 accounts OAuth working ✅
 
-**TODO:** Set up remaining accounts:
-- urbandanceteam@gmail.com
-- studio306nl@gmail.com
-- funkin4holland@gmail.com
-- c3studios.nl@gmail.com
+**All accounts working (verified 2026-02-20):**
+- papperpictures@gmail.com ✅
+- urbandanceteam@gmail.com ✅
+- studio306nl@gmail.com ✅
+- funkin4holland@gmail.com ✅
+- c3studios.nl@gmail.com ✅
 
 ### Sending (nimbus@studio306.nl via SMTP)
 - **Send email:** `cd /home/papperpictures/.openclaw/workspace && node send-email.js <to> <subject> <bodyFile> [--cc <cc>] [--attach <file>...]`
