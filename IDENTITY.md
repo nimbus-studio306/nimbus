@@ -8,4 +8,4 @@
 - **Emoji:** ⚡
 - **Voice (English):** Edge TTS — default female voice
 - **Voice (Hungarian):** Google TTS — `hu-HU-Chirp3-HD-Aoede`
-- **Avatar:** *(none yet)*
+- **Avatar:** `avatars/avatar_nimbus_final_square.png` (static), `avatars/avatar_nimbus_loop.mp4` (animated)
