@@ -15,6 +15,7 @@ This prevents hour-long response gaps. See `docs/reliability-issues.md` for cont
 1. **Update SESSIONS.md** — run `sessions_list`, refresh timestamps, topics, mark inactive sessions
 2. **Check DB watcher** — verify `pgrep -f "db-watcher.py"` is running; if not, run `startup.sh`
 3. Check email (cron handles this separately)
+   - **SPAM/PHISHING: Ignore silently, DO NOT notify Zsolt, DO NOT auto-delete** — Zsolt decides what to delete
 4. Check TODO.md — pick next uncompleted task and work on it for 10+ minutes
 5. If no progress since last heartbeat, explain why and fix it
 

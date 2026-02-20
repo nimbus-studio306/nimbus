@@ -10,7 +10,7 @@
 |---------|--------|------|
 | **WhatsApp Business** | ✅ Active | Two-way chat (+31651453590) |
 | **Telegram** | ✅ Active | Bot (@Nimbus_clawbot) |
-| **Web UI** | ✅ Active | nimbus.studio306.nl |
+| **Web UI** | ✅ Active | nimbus-cloud.studio306.nl |
 | **Signal** | ❌ Disabled | Config issues |
 | **Discord** | ⏸️ Available | Not configured |
 
@@ -154,7 +154,7 @@ Scripts: `check-email.js`, `send-email.js`, `save-email-to-db.py`
 |-----------|---------|
 | **VM** | GCP e2-medium, us-central1-a |
 | **OS** | Ubuntu 22.04 in Docker |
-| **Domain** | nimbus.studio306.nl |
+| **Domain** | nimbus-cloud.studio306.nl |
 | **Tunnel** | Cloudflare + Zero Trust 2FA |
 | **Model** | Claude Opus 4.5 (Anthropic) |
 | **Embeddings** | Gemini embedding-001 |

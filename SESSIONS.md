@@ -1,26 +1,17 @@
-# SESSIONS.md — Active Sessions Index
+# SESSIONS.md — Active Sessions
 
-*Last updated: 2026-02-17 08:51 UTC*
+Last updated: 2026-02-19 06:50 UTC
 
-## Main Session
-| Key | Channel | Last Activity | Topic |
-|-----|---------|---------------|-------|
-| `agent:default:main` | whatsapp | 2026-02-17 08:51 | nimbus-vm setup - pnpm OOM fix (swap) |
+## Active Sessions
 
-## Cron Jobs
-| Key | Label | Last Run | Status |
-|-----|-------|----------|--------|
-| `agent:default:cron:caac7b42-...` | email-check | 2026-02-17 08:36 | HEARTBEAT_OK |
+| Session | Channel | Last Activity | Topic |
+|---------|---------|---------------|-------|
+| agent:nimbus:main | webchat | just now | Heartbeat check |
 
-## Recent Gmail Hooks
-| Key | Time | Type | Notes |
-|-----|------|------|-------|
-| `hook:gmail:19c653695226eaf1` | 08:30 | Medium digest | Newsletter, ignored |
-| `hook:gmail:19c6527272d834d1` | 07:53 | Outgoing | Zsolt → Shylverste (video feedback) |
-| Multiple others | 07:45-07:53 | Outgoing | Same thread - video draft feedback |
-
-## Notes
-- **nimbus-vm status**: Zsolt working on OpenClaw install, hit OOM during pnpm install
-- Suggested swap fix (4GB swapfile)
-- DB watcher: ✅ running (pids 27, 4012)
-- No urgent emails requiring attention
+## Recent Work
+- **2026-02-19**: Regular heartbeat maintenance
+- **2026-02-18**: Fixed Mac Studio (studiokallos) OpenClaw setup
+  - Gateway wasn't loading on boot → fixed LaunchAgent
+  - Sessions from nimbus-vm clone removed (clean slate)
+  - Agent config paths fixed (case sensitivity)
+  - 3 agents configured: nimbus, deeper, agentmaster

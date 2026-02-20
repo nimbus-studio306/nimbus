@@ -1,15 +1,26 @@
 # Nimbus / OpenClaw VM — Setup & Maintenance Guide
 
-> ⚠️ **OUTDATED — DOCKER ERA** — As of 2026-02-17, OpenClaw runs NATIVELY (no Docker).
-> This file describes the old Docker setup. Paths like `/home/node/` and Docker commands no longer apply.
-> Native install: user=papperpictures, service=openclaw-gateway.service, config=/home/papperpictures/.openclaw/
+> ⚠️ **HISTORICAL DOCUMENT** (2026-02-20)
+> 
+> This document describes the **Docker-based setup** which is **NO LONGER IN USE**.
+> OpenClaw now runs **natively** on the VM as a systemd user service.
+> 
+> **Current setup:**
+> - User: `papperpictures` (not `node`)
+> - Install: `~/.npm-global/lib/node_modules/openclaw/`
+> - Config: `~/.openclaw/openclaw.json`
+> - Service: `openclaw-gateway.service` (systemd user service)
+> 
+> Keeping this file for historical reference only.
 
-> **Last verified**: 2026-02-12
+---
+
+> **Last verified**: 2026-02-12 (Docker era)
 > **VM**: GCP e2-medium `openclaw-agent` (34.10.85.7)
-> **Public URL**: https://nimbus.studio306.nl
-> **This file lives in two places** — keep both in sync:
-> 1. Local: `/Users/papperpictures/Desktop/development/github/openclaw/SETUP.md`
-> 2. VM: `~/.openclaw/workspace/SETUP.md`
+> **Public URL**: https://nimbus-cloud.studio306.nl
+> ~~**This file lives in two places** — keep both in sync:~~
+> ~~1. Local: `/Users/papperpictures/Desktop/development/github/openclaw/SETUP.md`~~
+> ~~2. VM: `~/.openclaw/workspace/SETUP.md`~~
 
 ---
 
@@ -36,7 +47,7 @@
                     ┌─────────────────────────────────────────────────┐
                     │  Internet                                       │
                     │                                                 │
-                    │  nimbus.studio306.nl ──► Cloudflare Zero Trust  │
+                    │  nimbus-cloud.studio306.nl ──► Cloudflare Zero Trust  │
                     │         │                (Google login 2FA)      │
                     └─────────┼───────────────────────────────────────┘
                               │
@@ -412,7 +423,7 @@ tunnel: <TUNNEL_UUID>
 credentials-file: /etc/cloudflared/<TUNNEL_UUID>.json
 
 ingress:
-  - hostname: nimbus.studio306.nl
+  - hostname: nimbus-cloud.studio306.nl
     service: http://localhost:18789
   - service: http_status:404
 EOF
@@ -421,7 +432,7 @@ EOF
 sudo cp ~/.cloudflared/<TUNNEL_UUID>.json /etc/cloudflared/
 
 # Create DNS record
-cloudflared tunnel route dns nimbus nimbus.studio306.nl
+cloudflared tunnel route dns nimbus nimbus-cloud.studio306.nl
 
 # Install as systemd service
 sudo cloudflared service install
@@ -432,7 +443,7 @@ sudo systemctl start cloudflared
 ```
 
 **Cloudflare Zero Trust Access** (configured in Cloudflare dashboard):
-- Application: nimbus.studio306.nl
+- Application: nimbus-cloud.studio306.nl
 - Policy: Google login required
 - Team: auth-studio
 - Allowed emails: studio306nl@gmail.com, papperpictures@gmail.com
@@ -461,7 +472,7 @@ sudo docker compose run --rm openclaw-cli channels login whatsapp
 ### 3.15: Deployment Verification Checklist
 
 - [ ] `sudo docker ps` — container running
-- [ ] `https://nimbus.studio306.nl` — loads through Cloudflare
+- [ ] `https://nimbus-cloud.studio306.nl` — loads through Cloudflare
 - [ ] `sudo docker logs openclaw-repo-openclaw-gateway-1` — no errors
 - [ ] Gateway startup shows: `[entrypoint] Running workspace startup`
 - [ ] db-watcher running: `sudo docker exec ... pgrep -f db-watcher`
@@ -612,7 +623,7 @@ ssh openclaw 'cd ~/openclaw-repo && sudo docker compose down && sudo docker comp
 
 ### Cloudflare Zero Trust Access
 
-- Application: nimbus.studio306.nl
+- Application: nimbus-cloud.studio306.nl
 - Team: auth-studio
 - Auth method: Google login
 - Allowed emails: studio306nl@gmail.com, papperpictures@gmail.com

@@ -7,16 +7,6 @@ read_when:
 
 Skills define *how* tools work. This file is for *your* specifics — the stuff that's unique to your setup.
 
-## ⚠️ WORKSPACE STRUCTURE (IMPORTANT)
-
-**Two different workspaces exist:**
-- **Main workspace:** `/home/papperpictures/.openclaw/workspace/` — shared scripts, plugins, tools
-- **Agent workspace:** `/home/papperpictures/.openclaw/agents/nimbus/workspace/` — my personal files (SOUL.md, MEMORY.md, etc.)
-
-**My agent workspace has NO scripts.** All executable scripts live in the main workspace.
-
-When running scripts, ALWAYS use full paths or `cd /home/papperpictures/.openclaw/workspace && ...`
-
 ## What Goes Here
 
 Things like:
@@ -31,30 +21,9 @@ Things like:
 
 ### English (Zsolt's preferred)
 - **Provider:** Edge TTS (built-in `tts` tool)
-- **Voice approved:** 2026-02-14
-
-### ⚠️ TTS - THREE MECHANISMS (IMPORTANT!)
-
-**1. `tts` tool (explicit function call):**
-- Call `tts({ text: "..." })` → generates audio and AUTO-DELIVERS
-- **DO NOT** output the MEDIA line afterward — causes duplicate!
-- Use when you want explicit control over what becomes audio
-
-**2. `[[tts:text]]...[[/tts:text]]` tags (inline marking):**
-- Wrap text in your response that should be spoken
-- Rest of response stays as text
-- Good for mixed text + audio responses
-
-**3. `[[tts]]` tag (simple):**
-- Marks content for TTS conversion
-
-**RULES:**
-- When Zsolt asks for TEXT response → no tts tool, no tags, plain text only
-- When Zsolt asks for VOICE response → use tts tool, don't output MEDIA line
-- When Zsolt wants MIXED → use tags for audio parts, write text parts normally
-- **NEVER** output MEDIA line after calling tts tool (it auto-delivers)
-
-**DO NOT** put example file paths in documentation — they get parsed as real media!
+- **Usage:** `tts({ text: "..." })` → returns `MEDIA:/path/to/file.mp3`
+- Then send via `message` tool with `media` + `asVoice: true`
+- This is the voice Zsolt approved (2026-02-14)
 
 ### Hungarian
 - **Provider:** Google Cloud TTS (via GEMINI_API_KEY)
@@ -76,32 +45,33 @@ response = client.models.generate_content(
     ]
 )
 ```
-- **Script:** `/home/papperpictures/.openclaw/workspace/scripts/voice/google-tts.sh "text" "hu-HU-Chirp3-HD-Aoede" "/tmp/output.mp3"`
+- **Script:** `./google-tts.sh "text" "hu-HU-Chirp3-HD-Aoede" "/tmp/output.mp3"`
 - Remember: name is **Nimbusz** in Hungarian!
 
 ### Google TTS (Alternative)
 - Available but NOT preferred for English
-- Script: `/home/papperpictures/.openclaw/workspace/scripts/voice/google-tts.sh "text" "en-US-Chirp3-HD-Aoede" "/tmp/output.mp3"`
+- Script: `./google-tts.sh "text" "en-US-Chirp3-HD-Aoede" "/tmp/output.mp3"`
 - Use only if specifically requested
 
 ## Email
 
 ### Gmail Access
-**gog CLI is installed** at `/usr/local/bin/gog`
-- Use `gog gmail` for multi-account Gmail access
-- papperpictures@gmail.com ✅ (oauth working)
+**NOTE:** `gog` CLI was documented but is NOT installed on this VM.
+Currently only papperpictures@gmail.com has OAuth2 access via `gmail-search.js`.
 
-**TODO:** Set up remaining accounts:
+**TODO:** Set up multi-account Gmail access (5 accounts total):
+- papperpictures@gmail.com ✅ (oauth working)
 - urbandanceteam@gmail.com
 - studio306nl@gmail.com
 - funkin4holland@gmail.com
 - c3studios.nl@gmail.com
 
+For now, use `gmail-search.js` for papperpictures@gmail.com only.
+
 ### Sending (nimbus@studio306.nl via SMTP)
-- **Send email:** `cd /home/papperpictures/.openclaw/workspace && node send-email.js <to> <subject> <bodyFile> [--cc <cc>] [--attach <file>...]`
+- **Send email:** `node send-email.js <to> <subject> <bodyFile> [--cc <cc>] [--attach <file>...]`
 - DKIM signed, saves to DB with embeddings
 - Supports attachments: `--attach file.pdf --attach image.jpg`
-- **Full path:** `/home/papperpictures/.openclaw/workspace/scripts/email/send-email.js`
 
 ### Creating Reply Drafts (IMPORTANT PROCESS)
 1. **ALWAYS fetch thread first:** `gog gmail thread get <id> --account <email>`
@@ -113,7 +83,7 @@ response = client.models.generate_content(
 
 ### Legacy (DO NOT USE)
 - ~~gmail-search.js~~ — single-account, superseded by gog
-- `/home/papperpictures/.openclaw/workspace/scripts/email/check-email.js` — still used by cron for inbox polling + DB persistence
+- check-email.js — still used by cron for inbox polling + DB persistence
 
 ## Knowledge Graph
 
@@ -173,21 +143,18 @@ session_grep({ pattern: "error", type_filter: "error", max_results: 10, include_
 - session-grep: `/home/papperpictures/.openclaw/workspace/plugins/session-grep/`
 
 ### CLI Scripts (for maintenance/debugging)
-All scripts in `/home/papperpictures/.openclaw/workspace/`:
-- **Search:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/graph-query.py search "topic"` — semantic search on entities
-- **Stats:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/graph-query.py stats` — node/edge counts
-- **Traverse:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/graph-query.py traverse <node_id> [depth]` — explore connections
-- **Extract:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/graph-extract.py extract message <id>` — extract entities from a message
-- **Process queue:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/graph-extract.py process [batch]` — process pending extractions
+- **Search:** `python3 graph-query.py search "topic"` — semantic search on entities
+- **Stats:** `python3 graph-query.py stats` — node/edge counts
+- **Traverse:** `python3 graph-query.py traverse <node_id> [depth]` — explore connections
+- **Extract:** `python3 graph-extract.py extract message <id>` — extract entities from a message
+- **Process queue:** `python3 graph-extract.py process [batch]` — process pending extractions
 - **Hot context:** `memory/graph-context.md` — auto-loaded, recent entities
-- **Update context:** `python3 /home/papperpictures/.openclaw/workspace/scripts/graph/update-graph-context.py` — refresh hot context file
+- **Update context:** `python3 update-graph-context.py` — refresh hot context file
 
 ## Database Scripts
-All scripts in `/home/papperpictures/.openclaw/workspace/`:
-- **DB watcher:** `python3 /home/papperpictures/.openclaw/workspace/scripts/database/db-watcher.py` — real-time sync from JSONL to PostgreSQL (runs in background)
-- **Save email:** `python3 /home/papperpictures/.openclaw/workspace/scripts/email/save-email-to-db.py <json_file>` — insert email with embedding
-- **Startup:** `/home/papperpictures/.openclaw/workspace/scripts/util/startup.sh` — starts db-watcher + runs batch embed
-- **Batch embed:** `python3 /home/papperpictures/.openclaw/workspace/scripts/database/batch-embed.py` — process messages missing embeddings
+- **DB watcher:** `python3 db-watcher.py` — real-time sync from JSONL to PostgreSQL (runs in background)
+- **Save email:** `python3 save-email-to-db.py <json_file>` — insert email with embedding
+- **Startup:** `./startup.sh` — starts db-watcher + runs batch embed
 
 ## Database Connection
 - **Host:** 81.0.107.97:5433 (Zsolt's Supabase VPS)
@@ -373,7 +340,7 @@ convert -size 600x200 gradient:navy-darkblue \
 ## My Capabilities (USE THESE)
 
 ### Data Search — In Order
-1. **Session files (SOURCE):** `grep "text" /home/papperpictures/.openclaw/agents/nimbus/sessions/*.jsonl`
+1. **Session files (SOURCE):** `grep "text" /home/papperpictures/.openclaw/agents/default/sessions/*.jsonl`
 2. **Database:** `psql "postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"` or Python with psycopg2
 3. **Workspace files:** `rg "text" /home/papperpictures/.openclaw/workspace/`
 
@@ -394,7 +361,7 @@ convert -size 600x200 gradient:navy-darkblue \
 - **tesseract** — OCR
 
 ### Key Paths
-- Session files: `/home/papperpictures/.openclaw/agents/nimbus/sessions/*.jsonl`
+- Session files: `/home/papperpictures/.openclaw/agents/default/sessions/*.jsonl`
 - My workspace: `/home/papperpictures/.openclaw/workspace/`
 - Media inbound: `/home/papperpictures/.openclaw/media/inbound/`
 - Claude Code: `/home/papperpictures/.local/bin/claude`, wrapper at `claude-msg`
@@ -404,7 +371,7 @@ convert -size 600x200 gradient:navy-darkblue \
 
 ### When Searching for Old Content
 1. Get exact text sample from user
-2. `grep "exact text" /home/papperpictures/.openclaw/agents/nimbus/sessions/*.jsonl`
+2. `grep "exact text" /home/papperpictures/.openclaw/agents/default/sessions/*.jsonl`
 3. If not found, then try database
 4. DON'T assume data is missing — try ALL sources first
 
@@ -458,7 +425,7 @@ That's it. No `allowGroups` field exists — use `groups` object with the JID as
 - **User:** papperpictures (native install — NO Docker)
 
 ### Ports (all behind Cloudflare, NOT directly exposed)
-- **18790** — OpenClaw gateway (WebSocket + HTTP)
+- **18789** — OpenClaw gateway (WebSocket + HTTP)
 
 ### Native Install (NO DOCKER)
 - OpenClaw runs natively as systemd user service: `openclaw-gateway.service`
@@ -468,7 +435,7 @@ That's it. No `allowGroups` field exists — use `groups` object with the JID as
 - **Claude Code:** /home/papperpictures/.local/bin/claude
 
 ### Cloudflare Tunnel
-- **Domain:** nimbus-cloud.studio306.nl → localhost:18790 (via nginx proxy on 18789)
+- **Domain:** nimbus-cloud.studio306.nl → localhost:18789
 - **Service:** cloudflared (systemd service)
 
 ## Voice Messages (TTS → Send)
@@ -499,29 +466,3 @@ Full skill: `skills/google-media-gen/SKILL.md`
 - Image-to-video works: pass `image=types.Image(image_bytes=..., mime_type=...)`
 - Download videos with `x-goog-api-key` header
 - Generation takes 1-2+ minutes, poll with `operation.done`
-
-## Google Calendar (gog)
-
-### Create event
-```bash
-gog calendar create primary \
-  --account papperpictures@gmail.com \
-  --summary "Event title" \
-  --from "2026-02-20T13:00:00+01:00" \
-  --to "2026-02-20T14:00:00+01:00" \
-  --location "Location" \
-  --description "Description" \
-  --reminder "popup:30m"
-```
-
-### List events
-```bash
-gog calendar events --account papperpictures@gmail.com --today
-gog calendar events --account papperpictures@gmail.com --tomorrow
-gog calendar events --account papperpictures@gmail.com --days 7
-```
-
-### Search events
-```bash
-gog calendar search "query" --account papperpictures@gmail.com
-```

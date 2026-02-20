@@ -31,7 +31,7 @@
 - [x] Reviewed code → WebSocket chat, voice input via SpeechRecognition, auto-send
 - [x] Documented → memory/knowledge/research-chat-interface.md
 - [x] Missing: no TTS playback, no WebRTC, Chrome-dependent STT
-- [x] Get it served/accessible → deployed at nimbus.studio306.nl/nimbus-app.html
+- [x] Get it served/accessible → deployed at nimbus-cloud.studio306.nl/nimbus-app.html
 - [x] Add TTS playback for responses → implemented in voice-proxy plugin
 
 ## Priority 2: Mac Mini / Local Setup Planning

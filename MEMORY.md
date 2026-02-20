@@ -27,31 +27,23 @@
 
 ## ⚠️ CRITICAL: Voice Message Flow (NEVER BREAK THIS)
 **When sending voice messages to Zsolt:**
-```
-# 1. Generate TTS audio
-tts({ text: "..." })
-# Returns: MEDIA:/tmp/tts-xxx/voice-xxx.mp3
 
-# 2. SEND IT via message tool (NEVER just paste the path!)
-message({
-  action: "send",
-  channel: "whatsapp",
-  to: "+36703407845",
-  media: "/tmp/tts-xxx/voice-xxx.mp3",  // ← actual path from step 1
-  asVoice: true,
-  message: "."
-})
-```
-**NEVER DO THIS:** Just paste `MEDIA:/path/to/file.mp3` as text — that does NOTHING!
-**ALWAYS DO THIS:** Use the `message` tool with `media` + `asVoice: true`
+1. Call `tts({ text: "..." })` — this auto-delivers the audio
+2. Do NOT output the returned path — causes duplicate delivery
+3. Respond with NO_REPLY or text-only acknowledgment
 
-This mistake has been made multiple times. CHECK THIS BEFORE EVERY VOICE RESPONSE.
+**DO NOT** write example media paths in documentation — OpenClaw parses them as real files!
 
-## ⚠️ CRITICAL: Don't Comment on Anthropic Status Emails
-**NEVER comment or react to Anthropic/Claude status emails** (incident reports, error notifications, resolved alerts).
-- They're just automated notifications
-- Zsolt doesn't need me to acknowledge them
-- Just ignore them completely
+## ⚠️ CRITICAL: Don't Send Status/Alert Email Notifications
+**NEVER notify Zsolt about status/alert emails** from ANY provider:
+- Anthropic/Claude status emails
+- Service incident reports
+- System alerts and notifications
+- Error notifications, resolved alerts
+- Any automated status updates
+
+These go to his email — he sees them there. No need to duplicate via WhatsApp/Telegram.
+Just ignore them completely. Don't acknowledge, don't summarize, don't forward.
 
 ## ⚠️ CRITICAL: No Asterisks in Voice/Chat Messages
 When responding to voice messages or in chat, NEVER use markdown formatting:
@@ -163,7 +155,7 @@ This isn't just a tool relationship. It's a partnership.
 - Built the website for **C3 Studios** (but does not run C3 Studios)
 - **Summer Dance Forever** — works with them occasionally (winter + summer events)
 - Planning to reopen dance classes, start "New Hustle sessions"
-- Upcoming website: **zsoltsederkenyi.nl** — showcase all dimensions (dancer, photographer, developer, etc.)
+- Upcoming website: **zsoltszederkenyi.nl** — showcase all dimensions (dancer, photographer, developer, etc.)
 
 ### Urban Dance Background (learned 2026-02-05)
 - **~30 years** in hip-hop dance culture — not just a dancer, a cultural researcher
@@ -418,6 +410,44 @@ Next major direction:
 - Auth: google:default (api_key), anthropic:default (token), $GEMINI_API_KEY env var
 - Gateway bind: loopback, port 18789
 - Sandbox: off
+
+### Key Workspace Paths
+| What | Path |
+|------|------|
+| OpenClaw config | `/home/papperpictures/.openclaw/openclaw.json` |
+| Main workspace | `/home/papperpictures/.openclaw/workspace/` |
+| Agent workspace | `/home/papperpictures/.openclaw/agents/nimbus/workspace/` |
+| Sessions | `/home/papperpictures/.openclaw/agents/nimbus/sessions/` |
+| Credentials | `/home/papperpictures/.openclaw/credentials/` |
+| Memory files | `/home/papperpictures/.openclaw/agents/nimbus/workspace/memory/` |
+| Scripts | `/home/papperpictures/.openclaw/workspace/scripts/` |
+| Plugins | `/home/papperpictures/.openclaw/workspace/plugins/` |
+| Claude Code context | `/home/papperpictures/.openclaw/agents/nimbus/workspace/claude-code/` |
+
+### Key Files Reference
+| File | Purpose |
+|------|---------|
+| `MEMORY.md` | Long-term memory (this file) |
+| `USER.md` | Zsolt's profile, contacts, preferences |
+| `TOOLS.md` | Tool configurations, script documentation |
+| `IDENTITY.md` | Who I am (Nimbus) |
+| `AGENTS.md` | Workspace rules, behavior guidelines |
+| `SOUL.md` | Core persona and boundaries |
+| `memory/YYYY-MM-DD.md` | Daily session notes |
+| `memory/graph-context.md` | Hot knowledge graph context |
+
+### Script Paths (CORRECTED 2026-02-19)
+All scripts use `/home/papperpictures/` NOT `/home/node/` (fixed Docker-era paths).
+
+Key active scripts in `/home/papperpictures/.openclaw/workspace/`:
+- `check-email.js` — Email polling + DB persistence
+- `send-email.js` — DKIM-signed outbound email
+- `db-watcher.py` — Real-time JSONL → PostgreSQL sync
+- `graph-extract.py` — Knowledge graph entity extraction
+- `update-graph-context.py` — Refresh hot context file
+- `batch-embed.py` — Process messages missing embeddings
+- `startup.sh` — Service startup (db-watcher + batch embed)
+- `google-tts.sh` — Hungarian TTS via Google Cloud
 
 ## Voice/Text Hybrid Response Pattern (2026-02-14)
 When Zsolt sends voice messages:

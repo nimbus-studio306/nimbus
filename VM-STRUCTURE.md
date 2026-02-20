@@ -1,8 +1,5 @@
 # VM File Structure
 
-> ⚠️ **OUTDATED — DOCKER ERA** — As of 2026-02-17, OpenClaw runs NATIVELY.
-> User is `papperpictures`, paths are under `/home/papperpictures/`, no Docker containers.
-
 Generated: 2026-02-02
 
 ## Home Directory (~/)
