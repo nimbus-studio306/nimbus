@@ -17,6 +17,18 @@ Skills define *how* tools work. This file is for *your* specifics — the stuff 
 
 When running scripts, ALWAYS use full paths or `cd /home/papperpictures/.openclaw/workspace && ...`
 
+## Avatars (2026-02-20)
+
+**Primary:**
+- `avatars/avatar_nimbus_final_square.png` — Nimbus profile (1024x1024)
+- `avatars/avatar_nimbus_loop.mp4` — Nimbus animated (9:16)
+- `avatars/avatar_nimbus_studio_final_clean.png` — Studio profile (1024x1024, text-free)
+- `avatars/avatar_nimbus_studio_soft_loop.mp4` — Studio animated (9:16)
+
+**Branded/Archive:** `avatars/` folder has 16 alternates (cyberpunk, soft, branded, square crops)
+
+---
+
 ## What Goes Here
 
 Things like:
