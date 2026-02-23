@@ -14,7 +14,7 @@
 - [x] Test grounding → CONFIRMED real web search (live weather data returned)
 - [x] Verified with current Rotterdam weather (4°C, Feb 4 2026 3:26 AM)
 - [x] Documented capabilities
-- [ ] Test reliability — sometimes grounding doesn't trigger (query-dependent)
+- [x] Test reliability — sometimes grounding doesn't trigger (query-dependent) — **DONE**: tested 5/5 buckets with `gemini-2.5-pro` (weather, news, navigation, fact, recent event) and all returned valid citations/grounding. `gemini-1.5-pro` is missing/deprecated in v1beta API.
 
 ### 🎙️ Real-Time Voice Solutions
 - [x] Research WebRTC + VAD architecture → documented

@@ -25,14 +25,19 @@
 
 **INCIDENT (2026-02-16):** Hammered Gemini STT with retries when it was rate-limited. Caused 3+ minute response delays, burned API quota, pissed Zsolt off. This was a violation of the "fail fast, don't retry" rule that was ALREADY in memory.
 
-## ⚠️ CRITICAL: Voice Message Flow (NEVER BREAK THIS)
-**When sending voice messages to Zsolt:**
+## ⚠️ CRITICAL: Voice Message Protocol
+**Logic:**
+- **Audio In → Audio Out** (Default).
+- **Text Request → Text Out** (If Zsolt says "read" or asks for text).
+- **Mixed → Audio + Text** (If context requires code/lists + voice).
 
-1. Call `tts({ text: "..." })` — this auto-delivers the audio
-2. Do NOT output the returned path — causes duplicate delivery
-3. Respond with NO_REPLY or text-only acknowledgment
-
-**DO NOT** write example media paths in documentation — OpenClaw parses them as real files!
+**Execution (WhatsApp, current transport):**
+1. Generate audio with `tts`.
+2. If TTS returns `[[audio_as_voice]]` + `MEDIA:/...`, treat delivery as already handled.
+3. **DO NOT** send the same audio again via `message.send(asVoice)` (causes duplicates).
+4. **NEVER** output raw `MEDIA:` paths in user-facing text.
+5. If full audio response: reply exactly `NO_REPLY`.
+6. If mixed response: tts for audio part, normal text for text part.
 
 ## ⚠️ CRITICAL: Don't Send Status/Alert Email Notifications
 **NEVER notify Zsolt about status/alert emails** from ANY provider:
@@ -280,7 +285,7 @@ DON'T guess config fields. DON'T ask for invite links. Just check sessions and p
 - dmPolicy "open" routes agent responses to non-owner senders — catastrophic on shared accounts
 - Gateway restarts take minutes — avoid unnecessary config changes
 - signal-cli link URIs expire fast — need QR in terminal, not via chat relay
-- MEDIA:/path lines must be sent via message tool, not inline text
+- (Superseded 2026-02-19) Old MEDIA:/path manual-send pattern is deprecated; current rule is `tts` tool auto-delivers and we must NOT output/send placeholder MEDIA paths
 - Audio transcription via Google is intermittent
 - `openclaw` CLI commands fail from sandbox — permission denied
 - Cross-channel messaging denied (can't send Signal from WhatsApp session)

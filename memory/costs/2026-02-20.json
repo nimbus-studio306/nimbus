@@ -1,0 +1,14 @@
+{
+  "date": "2026-02-20",
+  "generatedAt": "2026-02-20T22:00:09.152Z",
+  "summary": {
+    "claudeApiCost": 0,
+    "externalApiCost": 0,
+    "totalCost": 0,
+    "totalMessages": 0,
+    "totalTokens": 0
+  },
+  "byModel": {},
+  "bySession": {},
+  "externalByService": {}
+}

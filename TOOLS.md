@@ -29,6 +29,22 @@ When running scripts, ALWAYS use full paths or `cd /home/papperpictures/.opencla
 
 ---
 
+## ⚠️ JSON Editing (CRITICAL)
+
+**NEVER use `edit` tool on `.json` files.** The exact whitespace matching fails constantly.
+
+**USE `jq` instead:**
+```bash
+jq '.path.to.key = value' file.json > /tmp/out.json && mv /tmp/out.json file.json
+```
+
+Example (editing openclaw.json):
+```bash
+jq '.agents.defaults.models."anthropic/claude-opus-4-6".alias = "opus"' openclaw.json > /tmp/config.json && mv /tmp/config.json openclaw.json
+```
+
+Then restart gateway if needed. **jq is 100% reliable for JSON edits.**
+
 ## What Goes Here
 
 Things like:
@@ -45,28 +61,50 @@ Things like:
 - **Provider:** Edge TTS (built-in `tts` tool)
 - **Voice approved:** 2026-02-14
 
-### ⚠️ TTS - THREE MECHANISMS (IMPORTANT!)
+### ⚠️ Voice Reply Protocol (Flexible & Strict Delivery)
 
-**1. `tts` tool (explicit function call):**
-- Call `tts({ text: "..." })` → generates audio and AUTO-DELIVERS
-- **DO NOT** output the MEDIA line afterward — causes duplicate!
-- Use when you want explicit control over what becomes audio
+**The Logic (INTENT):**
+1. **Default:** Audio In → Audio Out.
+2. **Override (Text):** If Zsolt asks for text (or "read"), output **TEXT ONLY**.
+3. **Override (Mixed):** If Zsolt asks for both or specific parts, use `[[tts]]` tags for the audio parts.
 
-**2. `[[tts:text]]...[[/tts:text]]` tags (inline marking):**
-- Wrap text in your response that should be spoken
-- Rest of response stays as text
-- Good for mixed text + audio responses
+**The Delivery (MECHANISM - HARD RULE, NEVER BREAK THIS):**
+Chronological ordering is critical — messages must arrive in the order sent.
 
-**3. `[[tts]]` tag (simple):**
-- Marks content for TTS conversion
+**For audio-only responses:**
+1. Call `tts({ text: "..." })`.
+2. TTS returns audio_as_voice marker — treat delivery as already handled by transport.
+3. Reply exactly `NO_REPLY`.
 
-**RULES:**
-- When Zsolt asks for TEXT response → no tts tool, no tags, plain text only
-- When Zsolt asks for VOICE response → use tts tool, don't output MEDIA line
-- When Zsolt wants MIXED → use tags for audio parts, write text parts normally
-- **NEVER** output MEDIA line after calling tts tool (it auto-delivers)
+**For mixed responses (text + audio):**
+1. Send text message FIRST via `message.send()` (wait for result).
+2. Add delay (300ms minimum) to ensure text reaches transport queue first.
+3. Then call `tts(...)` for audio immediately.
+4. Reply `NO_REPLY` after audio is queued.
 
-**DO NOT** put example file paths in documentation — they get parsed as real media!
+**Critical - FIFO Chronological Order (HARD RULE):**
+- User message arrives
+- [I process and understand]
+- Send acknowledgment: brief confirmation I understood
+- [delay 300ms]
+- Send text response
+- [delay 300ms]  
+- Send audio response
+- [STOP - NO FURTHER MESSAGES]
+- Reply NO_REPLY
+
+**NEVER:**
+- Send multiple independent text messages
+- Add explanatory text between acknowledgment and response
+- Send commentary about what I just did
+- Break the response into scattered pieces
+
+Sequence is: acknowledgment → [delay] → text → [delay] → audio → STOP
+
+### 🚫 Ordering Guard (2026-02-22)
+- Audio must never arrive before its text explanation
+- Use the two-step pipeline: text → delay → audio → NO_REPLY
+- If ordering appears wrong again, increase delay or use audio-only responses
 
 ### Hungarian
 - **Provider:** Google Cloud TTS (via GEMINI_API_KEY)
@@ -537,4 +575,142 @@ gog calendar events --account papperpictures@gmail.com --days 7
 ### Search events
 ```bash
 gog calendar search "query" --account papperpictures@gmail.com
+```
+
+## Gmail Router (CRITICAL)
+**Location:** `/home/papperpictures/.openclaw/workspace/scripts/email/gmail-multi-router.js`
+**Systemd:** `~/.config/systemd/user/gmail-router.service`
+
+**MUST have this environment variable:**
+```
+Environment="GOG_KEYRING_PASSWORD=openclaw"
+```
+
+Without it, gog cannot access OAuth tokens in non-TTY mode and the router fails silently.
+
+**Verify working:**
+```bash
+systemctl --user status gmail-router
+tail /tmp/gmail-router.log
+```
+
+If you see "no TTY available for keyring" errors, the password is missing.
+
+## STT (Speech-to-Text)
+
+**ALWAYS use these models - NEVER use 2.0 Flash:**
+- **Primary:** `gemini-2.5-pro`
+- **Fallback:** `gemini-2.5-flash`
+
+Script pattern:
+```python
+response = client.models.generate_content(
+    model='gemini-2.5-pro',  # NEVER 2.0!
+    contents=[
+        'Transcribe this audio accurately. Output only the transcription, nothing else.',
+        {'inline_data': {'mime_type': 'audio/wav', 'data': base64.b64encode(audio_data).decode()}}
+    ]
+)
+```
+
+## Custom Chat Commands
+
+| Command | Action | Script |
+|---------|--------|--------|
+| `/lsmodels` | List all available models with aliases | `node /home/papperpictures/.openclaw/workspace/scripts/list-models.js` |
+
+When a user types `/lsmodels` in chat, run the script above and send the output as the reply.
+
+## Code Graph (Live — Feb 22, 2026)
+
+The code graph is **fully operational** with 11,008 nodes, 16,735 edges, and 100% embedding coverage across all repos.
+
+### Database Tables (already created and populated)
+- `code_nodes` — 11,008 entries (functions, files, classes, modules, types, interfaces, methods, config_keys)
+- `code_edges` — 16,735 entries (imports, defines, exports, contains, extends, implements)
+- `code_graph_status` — tracks which chunks have been processed
+
+### CLI: `nimbus code-graph`
+```bash
+nimbus code-graph extract [--repo X] [--force]   # regex extraction from code_chunks
+nimbus code-graph resolve                          # cross-file import resolution
+nimbus code-graph embed [--limit N]                # generate Gemini embeddings
+nimbus code-graph stats                            # print graph statistics
+nimbus code-graph query <name>                     # quick node lookup
+nimbus code-graph reset                            # truncate all code graph tables
+nimbus index-all                                   # full pipeline: index + extract + resolve + embed
+```
+
+### Post-Commit Hooks
+Installed in all 7 GitHub repos on studiokallos. On every commit, automatically runs: index → extract → resolve → embed (background, logs to /tmp/openclaw-post-commit.log).
+
+### Scripts Location
+All code-graph scripts are in the **main workspace**: `/home/papperpictures/.openclaw/workspace/scripts/code-graph/`
+
+### Do NOT re-initialize
+Tables exist and are populated. Do not run CREATE TABLE or initialization — it will fail or wipe data.
+
+
+## Voice MCP (Kokoro TTS + MLX Whisper STT) on Mac Studio
+
+The voice-mcp runs on studiokallos with an HTTP API on port 18792.
+Access via node: `openclaw nodes invoke --node studiokallos --command system.run`
+
+### Speak on Mac Studio Speakers
+```bash
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["curl","-s","-X","POST","http://127.0.0.1:18792/speak","-H","Content-Type: application/json","-d","{\"text\":\"Hello from nimbus VM\",\"voice\":\"af_heart\",\"speed\":1.0}"]}' \
+  --json --invoke-timeout 30000
+```
+
+### Generate Audio File (WAV/FLAC)
+```bash
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["curl","-s","-X","POST","http://127.0.0.1:18792/tts","-H","Content-Type: application/json","-d","{\"text\":\"Hello\",\"voice\":\"af_heart\"}","-o","/tmp/output.wav"]}' \
+  --json
+```
+
+### Other Endpoints
+- `GET /health` — `{"ok": true, "tts": "kokoro", "stt": "mlx-whisper"}`
+- `GET /voices` — List available voice presets
+- `GET /status` — Playback queue status
+- `POST /stop` — Stop current playback
+- `POST /stt` — Transcribe audio (send raw bytes, query: ?model=medium&language=en)
+
+
+### Record from Mac Studio Mic and Transcribe (STT)
+
+Record audio from the AirPods/mic and transcribe via MLX Whisper.
+The listen script is at `/tmp/listen.py` on studiokallos.
+
+```bash
+# Record and transcribe (default 30s, with start/end beeps)
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["/Users/studiokallos/.openclaw/services/voice-mcp/.venv/bin/python3","/tmp/listen.py"]}' \
+  --json --invoke-timeout 90000
+
+# Optional durations: 15, 30 (default), 60, 120, 180 seconds
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["/Users/studiokallos/.openclaw/services/voice-mcp/.venv/bin/python3","/tmp/listen.py","15"]}' \
+  --json --invoke-timeout 60000
+```
+
+The script plays a beep before recording starts and another when recording ends.
+Records from the default mic at 16kHz mono, then transcribes via MLX Whisper.
+Set invoke-timeout to at least duration + 30 seconds for transcription time.
+
+**STT query params:** `?model=small|medium|large&language=en&corrections=true`
+
+### Full Voice Loop Example
+
+```bash
+# 1. Listen to user
+TRANSCRIPT=$(openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["/Users/studiokallos/.openclaw/services/voice-mcp/.venv/bin/python3","/tmp/listen.py","5"]}' \
+  --json --invoke-timeout 60000 | jq -r '.payload.stdout' | grep 'Transcription:' | sed 's/Transcription: //')
+
+# 2. Process and respond via TTS
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params "{\"command\":[\"curl\",\"-s\",\"-X\",\"POST\",\"http://127.0.0.1:18792/speak\",\"-H\",\"Content-Type: application/json\",\"-d\",\"{\\\"text\\\":\\\"Your response here\\\",\\\"voice\\\":\\\"af_heart\\\"}\"]}" \
+  --json --invoke-timeout 30000
 ```

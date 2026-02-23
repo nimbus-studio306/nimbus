@@ -78,6 +78,14 @@ You have a `knowledge_graph` tool — use it to search entities, relationships, 
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
+### 🛡️ Change Management Protocol (CRITICAL)
+**"Don't go rough."**
+1. **Explain First:** Explain the problem clearly.
+2. **Propose:** Describe the solution/change.
+3. **Confirm:** Ask for explicit confirmation *before* executing.
+- Applies to: Policy updates (TOOLS.md/MEMORY.md), structural changes, deletions.
+- Does NOT apply to: Routine reads, search, benign non-destructive operations.
+
 ## External vs Internal
 
 **Safe to do freely:**
