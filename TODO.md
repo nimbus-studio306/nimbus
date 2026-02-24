@@ -88,7 +88,7 @@
 - [x] Gmail Pub/Sub notifications working (real-time email alerts) ✅
 - [ ] OAuth2 setup for additional accounts (~5 Gmail accounts total)
 - [ ] Alias system for easy reference (e.g. "personal", "studio", "business")
-- [ ] Create EMAIL-PROFILES.md document specifying for each account:
+- [x] Create EMAIL-PROFILES.md document specifying for each account:
   - How to sign/name (which name to use)
   - Signature format
   - Tone and communication style
@@ -145,5 +145,5 @@
 - [x] Tested: both sent and received emails saving with embeddings ✅
 
 ---
-*Updated: 2026-02-11 04:30 UTC*
+*Updated: 2026-02-24 21:12 UTC*
 *Check this every heartbeat. Pick next uncompleted task.*
