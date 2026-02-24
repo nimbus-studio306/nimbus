@@ -133,7 +133,7 @@
 ### 📚 Continue Learning
 - [x] Deeper dive into OpenClaw modules → memory/knowledge/openclaw-extension-guide.md (987 lines)
 - [x] Explore what I can build → skills, hooks, plugins, providers all documented
-- [ ] Keep MEMORY.md lean — review and trim
+- [x] Keep MEMORY.md lean — review and trim
 
 ## Completed (Recent)
 
