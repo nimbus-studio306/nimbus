@@ -714,3 +714,75 @@ openclaw nodes invoke --node studiokallos --command system.run \
   --params "{\"command\":[\"curl\",\"-s\",\"-X\",\"POST\",\"http://127.0.0.1:18792/speak\",\"-H\",\"Content-Type: application/json\",\"-d\",\"{\\\"text\\\":\\\"Your response here\\\",\\\"voice\\\":\\\"af_heart\\\"}\"]}" \
   --json --invoke-timeout 30000
 ```
+
+
+## Google Meet (Playwright on Mac Studio)
+
+Join, create, and manage Google Meet calls via Playwright browser on studiokallos.
+Script: `/Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py`
+Account: nimbus.kallossoft@gmail.com (persistent session in `/tmp/pw-meet-profile2`)
+
+### Commands
+
+| Command | Description | Needs GUI | Gateway timeout safe |
+|---------|-------------|-----------|---------------------|
+| `status` | Check if signed in | No (headless) | Yes |
+| `signin <email> <pass> [totp]` | Sign in to Google | Yes | No |
+| `create` | Create meeting, return link | Yes | No |
+| `invite <url> <emails...>` | Calendar invite with Meet link | Yes | No |
+| `join <url>` | Join meeting (long-running) | Yes | No |
+| `admit` | Admit waiting guests | Yes | No |
+| `leave` | Leave/close meeting browser | No | Yes |
+
+### Check Status (via node invoke — fast, <30s)
+```bash
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["python3","/Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py","status"]}' \
+  --json --invoke-timeout 30000
+```
+
+### Create Meeting (via SSH — exceeds gateway 30s timeout)
+```bash
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py create"'
+```
+
+### Join Meeting (via SSH — long-running, stays in call)
+```bash
+# Join with mic on, camera off
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py join https://meet.google.com/xxx-xxxx-xxx"' &
+
+# Join with auto-admit enabled
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_AUTO_ADMIT=1 MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py join https://meet.google.com/xxx-xxxx-xxx"' &
+```
+
+### Send Calendar Invite (via SSH)
+```bash
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py invite https://meet.google.com/xxx-xxxx-xxx email1@example.com email2@example.com"'
+```
+
+### Admit Waiting Guests (via SSH)
+```bash
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py admit"'
+```
+
+### Leave Meeting
+```bash
+# Via node invoke (fast)
+openclaw nodes invoke --node studiokallos --command system.run \
+  --params '{"command":["python3","/Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py","leave"]}' \
+  --json --invoke-timeout 30000
+```
+
+### Sign In (only needed if session expires)
+```bash
+ssh studiokallos 'sudo launchctl asuser 501 su - studiokallos -c "MEET_GUI_SESSION=1 python3 /Users/studiokallos/.openclaw/workspace/scripts/meet/meet-join.py signin nimbus.kallossoft@gmail.com KALLOSsoft_0422 <TOTP_CODE>"'
+```
+Ask Zsolt for the TOTP code from Google Authenticator.
+
+### Notes
+- GUI commands need `sudo launchctl asuser 501` for macOS WindowServer access
+- The `join` command stays alive (loop) — run in background with `&`
+- Auto-admit (`MEET_AUTO_ADMIT=1`) checks every 5s for waiting guests
+- Mic uses BlackHole 16ch (virtual audio for meet-bridge integration)
+- Screenshots saved to `/tmp/meet-*.png` for debugging
+- Related: `meet-bridge.py` (audio bridge with VAD/STT/TTS), `meet-mode.sh` (audio routing)

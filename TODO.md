@@ -110,7 +110,7 @@
 - [x] Audit current credential storage → memory/knowledge/security-credential-audit.md
 - [x] Fixed: removed partial API key prefix from tracked files
 - [x] Review and redact gateway token from TOOLS.md → already REDACTED
-- [ ] Research Supabase Vault integration patterns
+- [x] Research Supabase Vault integration patterns → memory/knowledge/supabase-vault-integration.md (7.7KB, hybrid approach recommended)
 - [x] Add `*.env` `*.key` to .gitignore → already present
 
 ## Priority 2.5: Vision & Architecture Documentation
