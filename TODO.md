@@ -97,7 +97,7 @@
 - [ ] Discuss with Zsolt to define each account's profile
 
 ### 🎙️ Real-Time Audio Transcription
-- [ ] Research proper real-time transcription for Zoom calls (not post-recording)
+- [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
 - [ ] Research real-time transcription for WhatsApp calls
 - [ ] Need raw digital audio capture, not microphone recording
 - [ ] Explore browser audio capture APIs
