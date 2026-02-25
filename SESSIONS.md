@@ -1,6 +1,18 @@
 # SESSIONS.md — Active Sessions
 
-Last updated: 2026-02-25 00:26 UTC
+Last updated: 2026-02-25 02:05 UTC
+
+## Recent Work
+- **2026-02-25**: Voice Mode Improvements
+  - Updated voice-proxy plugin with fixes from debugging report
+  - Changed STT model: gemini-2.5-pro → gemini-2.5-flash (faster transcription)
+  - Added Hungarian voice support: hu-HU-Chirp3-HD-Aoede
+  - Added audio format validation (wav, mp3, mpeg, ogg, webm)
+  - Created /voice/voices endpoint to list available voices
+  - Improved error handling and logging
+  - Better temp file cleanup with try/finally blocks
+  - Increased timeout: 30s → 60s for longer audio
+  - **Note:** Gateway restart required to apply changes
 
 ## Recent Work
 - **2026-02-25**: Voice Mode Debugging
