@@ -1,9 +1,14 @@
 # SESSIONS.md — Active Sessions
 
-Last updated: 2026-02-25 00:15 UTC
+Last updated: 2026-02-25 00:17 UTC
 
 ## Recent Work
-- **2026-02-25**: Security infrastructure research
+- **2026-02-25**: Real-Time Audio Transcription research
+  - Documented hybrid approach: BlackHole for desktop apps, getUserMedia for browser apps
+  - Tested Gemini STT integration patterns (3 options documented)
+  - Addressed technical challenges: audio format conversion, latency, privacy
+  - Created implementation roadmap with 3 phases (POC, browser, production)
+- **2026-02-25**: Security infrastructure research (Supabase Vault)
   - Reviewed Calendar write access (found missing refresh token, needs re-authorization)
   - Completed Supabase Vault integration research
   - Documented hybrid approach: Phase 1 (DB+RLS) vs Phase 2 (Vault integration)
