@@ -24,7 +24,7 @@
 - [x] **DONE**: Gemini Live API works! Text + audio modes confirmed. Native audio model available.
 - [x] Research streaming TTS (chunked playback) → implemented in voice-proxy plugin
 - [x] Nimbus app voice mode built (nimbus-app.html) — basic prototype exists
-- [ ] **IMPROVE**: Voice mode doesn't work properly — needs debugging/rewrite
+- [x] **IMPROVE**: Voice mode doesn't work properly — needs debugging/rewrite → **FIXED**: Updated voice-proxy plugin with improvements (gemini-2.5-flash, Hungarian voice support, better error handling)
 
 ### 🖥️ Chat Interface Review
 - [x] Found nimbus-app/ → single-file PWA (1185 lines)
