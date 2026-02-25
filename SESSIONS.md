@@ -1,8 +1,14 @@
 # SESSIONS.md — Active Sessions
 
-Last updated: 2026-02-25 00:08 UTC
+Last updated: 2026-02-25 00:10 UTC
 
-## Active Sessions
+## Recent Work
+- **2026-02-25**: Security infrastructure research
+  - Reviewed Calendar write access (found missing refresh token, needs re-authorization)
+  - Completed Supabase Vault integration research
+  - Documented hybrid approach: Phase 1 (DB+RLS) vs Phase 2 (Vault integration)
+  - Created migration patterns and security considerations
+- **2026-02-24**: Heartbeat maintenance and EMAIL-PROFILES.md creation
 
 | Session | Channel | Last Activity | Topic |
 |---------|---------|---------------|-------|
