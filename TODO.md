@@ -93,6 +93,7 @@
   - Signature format
   - Tone and communication style
   - When to use this account
+  - **DONE**: Draft created at `memory/knowledge/EMAIL-PROFILES.md` — awaiting Zsolt's review
 - [ ] Never assume which account - always confirm before sending
 - [ ] Discuss with Zsolt to define each account's profile
 
@@ -145,5 +146,5 @@
 - [x] Tested: both sent and received emails saving with embeddings ✅
 
 ---
-*Updated: 2026-02-24 21:12 UTC*
+*Updated: 2026-02-25 06:51 UTC*
 *Check this every heartbeat. Pick next uncompleted task.*
