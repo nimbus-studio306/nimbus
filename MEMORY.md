@@ -28,13 +28,22 @@
 - **Text Request → Text Out** (If Zsolt says "read")
 - **Mixed → Audio + Text** (If context requires code/lists + voice)
 
-**Execution (WhatsApp, current transport):**
-1. Generate audio with `tts`
-2. If TTS returns `[[audio_as_voice]]` + `MEDIA:/...`, treat delivery as already handled
-3. **DO NOT** send the same audio again via `message.send(asVoice)` (causes duplicates)
-4. **NEVER** output raw `MEDIA:` paths in user-facing text
-5. If full audio response: reply exactly `NO_REPLY`
-6. If mixed response: tts for audio part, normal text for text part
+**Execution (WhatsApp, current transport) - CORRECTED 2026-03-03:**
+1. Call `tts({ text: "..." })` to generate audio
+2. **OUTPUT** the `[[audio_as_voice]]` + `MEDIA:/...` line in your response (this is what delivers the audio)
+3. Then reply `NO_REPLY`
+
+**Key correction:** The `[[audio_as_voice]]` line must be included in your response output — not processed silently. The transport picks it up from your response.
+
+**Wrong patterns to avoid:**
+- Calling tts but NOT outputting the result
+- Using `message.send(asVoice: true)` separately
+- Just replying `NO_REPLY` without the media line
+
+**Mixed response (text + audio):**
+1. Send text via `message` tool first
+2. Then tts for audio + output the media line
+3. Then `NO_REPLY`
 
 ## ⚠️ CRITICAL: Don't Send Status/Alert Email Notifications
 **NEVER notify Zsolt about status/alert emails** from ANY provider:
@@ -293,3 +302,19 @@ If content needs to be visible (links, numbers, code), send it as separate TEXT 
 ## Response Mode Keywords (2026-02-14)
 - If Zsolt says **"read"** at the END → respond in TEXT (no voice), even if he sent voice
 - Default: voice in → voice out, text in → text out
+
+## Active Projects Reference
+
+### AgentMaster / Nimbus Studio (studiokallos)
+**WHEN THIS PROJECT IS MENTIONED:**
+1. Read `AGENTMASTER-COORDINATION.md` in this workspace FIRST
+2. Check knowledge graph for "Agent Master" and "nimbus.studio306" entities
+3. Understand this is a PLANNING GROUP — do NOT interfere with active development on studiokallos
+4. Treat updates from this group as informational only
+5. Coordinate through Zsolt Szederkényi before taking any action
+
+**Key Files:**
+- Coordination doc: `/home/papperpictures/.openclaw/agents/nimbus/workspace/AGENTMASTER-COORDINATION.md`
+- Active agent: `agentmaster` on `studiokallos` (Mac Studio M1 Max)
+- Client: KallosSoft / Zsolt Kallos
+- Related: Knowledge graph entities "Agent Master" (ID 1496), "nimbus.studio306" (ID 1434)
