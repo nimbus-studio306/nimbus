@@ -97,9 +97,11 @@
 - [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
 - [x] Account configuration module → memory/knowledge/ACCOUNTS.md ✅
 - [x] Gmail v2 tool with account switching → scripts/email/gmail-search-v2.js ✅
-- [ ] Never assume which account - always confirm before sending
-- [ ] Discuss with Zsolt to define each account's profile
-- [ ] Test with at least one additional account (urbandanceteam)
+- [x] Fixed module require path → working v2 tool ✅
+- [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
+- [ ] Review and finalize EMAIL-PROFILES.md with Zsolt
+- [ ] Define clear routing rules for automatic account selection
+- [ ] Update Gmail router (gmail-multi-router.js) to support multi-account
 
 ### 🎙️ Real-Time Audio Transcription
 - [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
@@ -150,5 +152,5 @@
 - [x] Tested: both sent and received emails saving with embeddings ✅
 
 ---
-*Updated: 2026-03-09 22:28 UTC*
+*Updated: 2026-03-09 22:35 UTC*
 *Check this every heartbeat. Pick next uncompleted task.*
