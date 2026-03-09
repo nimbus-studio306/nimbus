@@ -78,7 +78,7 @@
 ### 📅 Calendar Access
 - [x] Set up Google Calendar OAuth2 authentication → `google-calendar-auth.js` (commit 2ed8114)
 - [x] Read access to Zsolt's calendars (papperpictures@gmail.com) ✅
-- [ ] Add write access (create/update/delete events)
+- [x] Add write access (create/update/delete events) → fixed `test-calendar-write.js` request body + PATCH update; verified create/update/delete all working (2026-02-26)
 - [ ] Handle multiple Google accounts (need OAuth for additional accounts)
 - [ ] Figure out iCloud calendar sync (CalDAV or sync to Google)
 - [ ] Ability to schedule meetings and events
@@ -86,16 +86,20 @@
 ### 📧 Multiple Gmail Account Management
 - [x] Gmail read access via OAuth2 (papperpictures@gmail.com) → `gmail-search.js` ✅
 - [x] Gmail Pub/Sub notifications working (real-time email alerts) ✅
-- [ ] OAuth2 setup for additional accounts (~5 Gmail accounts total)
-- [ ] Alias system for easy reference (e.g. "personal", "studio", "business")
+- [x] OAuth2 setup for additional accounts (~5 Gmail accounts total) → `gmail-search-v2.js` ✅
+- [x] Alias system for easy reference (e.g. "personal", "studio", "business") → accounts/aliases configured ✅
 - [x] Create EMAIL-PROFILES.md document specifying for each account:
   - How to sign/name (which name to use)
   - Signature format
   - Tone and communication style
   - When to use this account
   - **DONE**: Draft created at `memory/knowledge/EMAIL-PROFILES.md` — awaiting Zsolt's review
+- [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
+- [x] Account configuration module → memory/knowledge/ACCOUNTS.md ✅
+- [x] Gmail v2 tool with account switching → scripts/email/gmail-search-v2.js ✅
 - [ ] Never assume which account - always confirm before sending
 - [ ] Discuss with Zsolt to define each account's profile
+- [ ] Test with at least one additional account (urbandanceteam)
 
 ### 🎙️ Real-Time Audio Transcription
 - [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
@@ -146,5 +150,5 @@
 - [x] Tested: both sent and received emails saving with embeddings ✅
 
 ---
-*Updated: 2026-02-25 06:51 UTC*
+*Updated: 2026-03-09 22:28 UTC*
 *Check this every heartbeat. Pick next uncompleted task.*
