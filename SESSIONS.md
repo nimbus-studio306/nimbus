@@ -1,8 +1,20 @@
 # SESSIONS.md — Active Sessions
 
-Last updated: 2026-02-25 07:58 UTC
+Last updated: 2026-03-10 13:03 UTC
 
 ## Recent Work
+- **2026-03-10**: Heartbeat check + Wim Havens reminder
+  - **URGENT REMINDER**: Wim Havens artwork delivery deadline — Friday, March 11th (2 days away)
+  - Verified db-watcher is running (PID 3091212)
+  - Updated SESSIONS.md timestamp
+  - Identified TODO.md discrepancies: several Gmail multi-account tasks marked complete but scripts don't exist
+  - Created daily memory file: memory/2026-03-10.md
+- **2026-02-26**: Heartbeat maintenance + Calendar write-access unblock
+  - Verified db-watcher is running (`db-watcher.py`, PID 131918)
+  - Ran calendar write test script and fixed request serialization bug in `scripts/meet/test-calendar-write.js`
+  - Switched update call from `PUT` to `PATCH` to avoid full-resource validation errors
+  - Re-tested successfully: create/update/delete event all pass
+  - Updated TODO.md to mark Google Calendar write access as complete
 - **2026-02-25**: Voice Mode Improvements
   - Updated voice-proxy plugin with fixes from debugging report
   - Changed STT model: gemini-2.5-pro → gemini-2.5-flash (faster transcription)
@@ -39,7 +51,7 @@ Last updated: 2026-02-25 07:58 UTC
 
 | Session | Channel | Last Activity | Topic |
 |---------|---------|---------------|-------|
-| agent:nimbus:heartbeat | heartbeat | 06:51 UTC | Heartbeat check |
+| agent:nimbus:heartbeat | heartbeat | 06:54 UTC | Heartbeat + calendar write-access fix |
 
 ## Recent Work
 - **2026-02-21**: Heartbeat maintenance

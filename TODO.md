@@ -86,7 +86,7 @@
 ### 📧 Multiple Gmail Account Management
 - [x] Gmail read access via OAuth2 (papperpictures@gmail.com) → `gmail-search.js` ✅
 - [x] Gmail Pub/Sub notifications working (real-time email alerts) ✅
-- [x] OAuth2 setup for additional accounts (~5 Gmail accounts total) → `gmail-search-v2.js` ✅
+- [x] OAuth2 setup for additional accounts (~5 Gmail accounts total) → **IN PROGRESS**: Creating `gmail-search-v2.js`
 - [x] Alias system for easy reference (e.g. "personal", "studio", "business") → accounts/aliases configured ✅
 - [x] Create EMAIL-PROFILES.md document specifying for each account:
   - How to sign/name (which name to use)
@@ -95,9 +95,8 @@
   - When to use this account
   - **DONE**: Draft created at `memory/knowledge/EMAIL-PROFILES.md` — awaiting Zsolt's review
 - [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
-- [x] Account configuration module → memory/knowledge/ACCOUNTS.md ✅
-- [x] Gmail v2 tool with account switching → scripts/email/gmail-search-v2.js ✅
-- [x] Fixed module require path → working v2 tool ✅
+- [x] Account configuration module → memory/knowledge/gmail-account-config.js ✅
+- [ ] **NEW**: Create gmail-search-v2.js with multi-account support
 - [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
 - [ ] Review and finalize EMAIL-PROFILES.md with Zsolt
 - [ ] Define clear routing rules for automatic account selection

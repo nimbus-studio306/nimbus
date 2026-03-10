@@ -2,10 +2,6 @@
 
 Skills define *how* tools work. This file is for *your* specifics — the stuff that's unique to your setup.
 
----
-
-# Critical Rules
-
 ## ⚠️ WORKSPACE STRUCTURE (IMPORTANT)
 
 **Two different workspaces exist:**
@@ -15,6 +11,7 @@ Skills define *how* tools work. This file is for *your* specifics — the stuff 
 **My agent workspace has NO scripts.** All executable scripts live in the main workspace.
 
 When running scripts, ALWAYS use full paths or `cd /home/papperpictures/.openclaw/workspace && ...`
+
 
 ## ⚠️ JSON Editing (CRITICAL)
 
@@ -31,10 +28,6 @@ jq '.agents.defaults.models."anthropic/claude-opus-4-6".alias = "opus"' openclaw
 ```
 
 Then restart gateway if needed. **jq is 100% reliable for JSON edits.**
-
----
-
-# Voice
 
 ## TTS Voices
 
@@ -91,11 +84,6 @@ Sequence is: acknowledgment → [delay] → text → [delay] → audio → STOP
 - **Provider:** Google Cloud TTS (via GEMINI_API_KEY)
 - **Voice:** `hu-HU-Chirp3-HD-Aoede`
 
-### Google TTS (Alternative)
-- Available but NOT preferred for English
-- Script: `/home/papperpictures/.openclaw/workspace/scripts/voice/google-tts.sh "text" "en-US-Chirp3-HD-Aoede" "/tmp/output.mp3"`
-- Use only if specifically requested
-
 ## STT (Speech-to-Text)
 
 **ALWAYS use these models - NEVER use 2.0 Flash:**
@@ -115,20 +103,10 @@ response = client.models.generate_content(
 - **Script:** `/home/papperpictures/.openclaw/workspace/scripts/voice/google-tts.sh "text" "hu-HU-Chirp3-HD-Aoede" "/tmp/output.mp3"`
 - Remember: name is **Nimbusz** in Hungarian!
 
-## Voice Messages (TTS → Send)
-
-**CORRECT FLOW:**
-1. Generate audio: `tts({ text: "Hello!" })` → returns a MEDIA line with actual path
-2. Output the MEDIA line exactly as returned — OpenClaw handles delivery
-
-**DO NOT** put example file paths in documentation — they get parsed as real media!
-
-## Voice MCP on Mac Studio
-See skill: `voice-mcp-mac` — speak on Mac speakers, generate audio, STT from mic, port 18792.
-
----
-
-# Communication
+### Google TTS (Alternative)
+- Available but NOT preferred for English
+- Script: `/home/papperpictures/.openclaw/workspace/scripts/voice/google-tts.sh "text" "en-US-Chirp3-HD-Aoede" "/tmp/output.mp3"`
+- Use only if specifically requested
 
 ## Email
 
@@ -161,95 +139,6 @@ See skill: `voice-mcp-mac` — speak on Mac speakers, generate audio, STT from m
 ### Legacy (DO NOT USE)
 - ~~gmail-search.js~~ — single-account, superseded by gog
 - `/home/papperpictures/.openclaw/workspace/scripts/email/check-email.js` — still used by cron for inbox polling + DB persistence
-
-## Gmail Router (CRITICAL)
-**Location:** `/home/papperpictures/.openclaw/workspace/scripts/email/gmail-multi-router.js`
-**Systemd:** `~/.config/systemd/user/gmail-router.service`
-
-**MUST have this environment variable:**
-```
-Environment="GOG_KEYRING_PASSWORD=openclaw"
-```
-
-Without it, gog cannot access OAuth tokens in non-TTY mode and the router fails silently.
-
-**Verify working:**
-```bash
-systemctl --user status gmail-router
-tail /tmp/gmail-router.log
-```
-
-If you see "no TTY available for keyring" errors, the password is missing.
-
-## Google Calendar (gog)
-
-### Create event
-```bash
-gog calendar create primary \
-  --account papperpictures@gmail.com \
-  --summary "Event title" \
-  --from "2026-02-20T13:00:00+01:00" \
-  --to "2026-02-20T14:00:00+01:00" \
-  --location "Location" \
-  --description "Description" \
-  --reminder "popup:30m"
-```
-
-### List events
-```bash
-gog calendar events --account papperpictures@gmail.com --today
-gog calendar events --account papperpictures@gmail.com --tomorrow
-gog calendar events --account papperpictures@gmail.com --days 7
-```
-
-### Search events
-```bash
-gog calendar search "query" --account papperpictures@gmail.com
-```
-
-## WhatsApp Group Setup (NEW GROUP PROCESS)
-
-When Zsolt creates a new WhatsApp group and adds me (+31651453590):
-
-1. **I'm already in the group** — no invite link needed
-2. **Find the JID** — run `sessions_list`, look for new group session with the group name
-3. **Add to config** — patch config to add the JID to `channels.whatsapp.groups`:
-   ```json
-   {
-     "channels": {
-       "whatsapp": {
-         "groups": {
-           "<JID>@g.us": { "requireMention": false }
-         },
-         "accounts": {
-           "default": {
-             "groups": {
-               "<JID>@g.us": { "requireMention": false }
-             }
-           }
-         }
-       }
-     }
-   }
-   ```
-4. **Gateway restarts automatically** after config.patch
-
-That's it. No `allowGroups` field exists — use `groups` object with the JID as key.
-
-## Custom Chat Commands
-
-| Command | Action | Script |
-|---------|--------|--------|
-| `/lsmodels` | List all available models with aliases | `node /home/papperpictures/.openclaw/workspace/scripts/list-models.js` |
-
-When a user types `/lsmodels` in chat, run the script above and send the output as the reply.
-
-## Google Meet
-See skill: `google-meet` — create/join/admit/leave meetings, SSH commands, GUI session notes.
-
----
-
-# Data & Knowledge
 
 ## Knowledge Graph
 
@@ -308,82 +197,18 @@ session_grep({ pattern: "error", type_filter: "error", max_results: 10, include_
 - knowledge-graph: `/home/papperpictures/.openclaw/workspace/plugins/knowledge-graph/`
 - session-grep: `/home/papperpictures/.openclaw/workspace/plugins/session-grep/`
 
-## Database
-
-- **Host:** 81.0.107.97:5433 (Zsolt's Supabase VPS)
-- **Schema:** `project_openclaw_nimbus`
-- **Tables:** `structured_sessions`, `structured_messages`, `structured_tool_calls`, `nodes`, `edges`, `emails`, `extraction_queue`
-- **Env vars:** `$DB_HOST`, `$DB_PORT`, `$DB_USER`, `$DB_PASSWORD`, `$DB_NAME`, `$DB_SCHEMA`
-
-**Scripts:**
+## Database Scripts
 All scripts in `/home/papperpictures/.openclaw/workspace/`:
 - **DB watcher:** `python3 /home/papperpictures/.openclaw/workspace/scripts/database/db-watcher.py` — real-time sync from JSONL to PostgreSQL (runs in background)
 - **Save email:** `python3 /home/papperpictures/.openclaw/workspace/scripts/email/save-email-to-db.py <json_file>` — insert email with embedding
 - **Startup:** `/home/papperpictures/.openclaw/workspace/scripts/util/startup.sh` — starts db-watcher + runs batch embed
 - **Batch embed:** `python3 /home/papperpictures/.openclaw/workspace/scripts/database/batch-embed.py` — process messages missing embeddings
 
-## Code Graph (Live — Feb 22, 2026)
-
-The code graph is **fully operational** with 11,008 nodes, 16,735 edges, and 100% embedding coverage across all repos.
-
-### Database Tables (already created and populated)
-- `code_nodes` — 11,008 entries (functions, files, classes, modules, types, interfaces, methods, config_keys)
-- `code_edges` — 16,735 entries (imports, defines, exports, contains, extends, implements)
-- `code_graph_status` — tracks which chunks have been processed
-
-### CLI: `nimbus code-graph`
-```bash
-nimbus code-graph extract [--repo X] [--force]   # regex extraction from code_chunks
-nimbus code-graph resolve                          # cross-file import resolution
-nimbus code-graph embed [--limit N]                # generate Gemini embeddings
-nimbus code-graph stats                            # print graph statistics
-nimbus code-graph query <name>                     # quick node lookup
-nimbus code-graph reset                            # truncate all code graph tables
-nimbus index-all                                   # full pipeline: index + extract + resolve + embed
-```
-
-### Post-Commit Hooks
-Installed in all 7 GitHub repos on studiokallos. On every commit, automatically runs: index → extract → resolve → embed (background, logs to /tmp/openclaw-post-commit.log).
-
-### Scripts Location
-All code-graph scripts are in the **main workspace**: `/home/papperpictures/.openclaw/workspace/scripts/code-graph/`
-
-### Do NOT re-initialize
-Tables exist and are populated. Do not run CREATE TABLE or initialization — it will fail or wipe data.
-
----
-
-# Infrastructure
-
-## Infrastructure — DO NOT SUGGEST ALTERNATIVES
-
-### Web UI Access
-- **URL:** https://nimbus-cloud.studio306.nl
-- **Auth:** token query param (see openclaw.json gateway.auth.token)
-- **NEVER suggest SSH tunnels, direct IP access, or opening firewall ports** — Cloudflare handles everything
-
-### VM
-- **Project:** neat-drummer-486005-e4
-- **OS:** Ubuntu 22.04 LTS
-- **User:** papperpictures (native install — NO Docker)
-
-### Ports (all behind Cloudflare, NOT directly exposed)
-- **18790** — OpenClaw gateway (WebSocket + HTTP)
-
-### Native Install (NO DOCKER)
-- OpenClaw runs natively as systemd user service: `openclaw-gateway.service`
-- **Config:** /home/papperpictures/.openclaw/openclaw.json
-- **Workspace:** /home/papperpictures/.openclaw/workspace/
-- **Agents:** /home/papperpictures/.openclaw/agents/
-- **Claude Code:** /home/papperpictures/.local/bin/claude
-
-### Cloudflare Tunnel
-- **Domain:** nimbus-cloud.studio306.nl → localhost:18790 (via nginx proxy on 18789)
-- **Service:** cloudflared (systemd service)
-
----
-
-# Tools & Capabilities
+## Database Connection
+- **Host:** 81.0.107.97:5433 (Zsolt's Supabase VPS)
+- **Schema:** `project_openclaw_nimbus`
+- **Tables:** `structured_sessions`, `structured_messages`, `structured_tool_calls`, `nodes`, `edges`, `emails`, `extraction_queue`
+- **Env vars:** `$DB_HOST`, `$DB_PORT`, `$DB_USER`, `$DB_PASSWORD`, `$DB_NAME`, `$DB_SCHEMA`
 
 ## Installed Capabilities
 
@@ -469,6 +294,9 @@ Use this when Brave Search API is unavailable or for research tasks.
 - **ffmpeg** — universal audio/video processing
 - **sox** — `sox in.wav out.mp3` — audio processing, effects, conversion
 
+## Web Browsing
+See skill: `web-browsing` — web_fetch, Playwright server, Vision API, full-page screenshots, ImageMagick fonts, troubleshooting.
+
 ## My Capabilities (USE THESE)
 
 ### Data Search — In Order
@@ -491,8 +319,158 @@ Use this when Brave Search API is unavailable or for research tasks.
 3. If not found, then try database
 4. DON'T assume data is missing — try ALL sources first
 
-## Web Browsing
-See skill: `web-browsing` — web_fetch, Playwright server, Vision API, full-page screenshots, ImageMagick fonts, troubleshooting.
+
+## WhatsApp Group Setup (NEW GROUP PROCESS)
+
+When Zsolt creates a new WhatsApp group and adds me (+31651453590):
+
+1. **I'm already in the group** — no invite link needed
+2. **Find the JID** — run `sessions_list`, look for new group session with the group name
+3. **Add to config** — patch config to add the JID to `channels.whatsapp.groups`:
+   ```json
+   {
+     "channels": {
+       "whatsapp": {
+         "groups": {
+           "<JID>@g.us": { "requireMention": false }
+         },
+         "accounts": {
+           "default": {
+             "groups": {
+               "<JID>@g.us": { "requireMention": false }
+             }
+           }
+         }
+       }
+     }
+   }
+   ```
+4. **Gateway restarts automatically** after config.patch
+
+That's it. No `allowGroups` field exists — use `groups` object with the JID as key.
+
+## Infrastructure — DO NOT SUGGEST ALTERNATIVES
+
+### Web UI Access
+- **URL:** https://nimbus-cloud.studio306.nl
+- **Auth:** token query param (see openclaw.json gateway.auth.token)
+- **NEVER suggest SSH tunnels, direct IP access, or opening firewall ports** — Cloudflare handles everything
+
+### VM
+- **Project:** neat-drummer-486005-e4
+- **OS:** Ubuntu 22.04 LTS
+- **User:** papperpictures (native install — NO Docker)
+
+### Ports (all behind Cloudflare, NOT directly exposed)
+- **18790** — OpenClaw gateway (WebSocket + HTTP)
+
+### Native Install (NO DOCKER)
+- OpenClaw runs natively as systemd user service: `openclaw-gateway.service`
+- **Config:** /home/papperpictures/.openclaw/openclaw.json
+- **Workspace:** /home/papperpictures/.openclaw/workspace/
+- **Agents:** /home/papperpictures/.openclaw/agents/
+- **Claude Code:** /home/papperpictures/.local/bin/claude
+
+### Cloudflare Tunnel
+- **Domain:** nimbus-cloud.studio306.nl → localhost:18790 (via nginx proxy on 18789)
+- **Service:** cloudflared (systemd service)
+
+## Voice Messages (TTS → Send)
+
+**CORRECT FLOW:**
+1. Generate audio: `tts({ text: "Hello!" })` → returns a MEDIA line with actual path
+2. Output the MEDIA line exactly as returned — OpenClaw handles delivery
+
+**DO NOT** put example file paths in documentation — they get parsed as real media!
 
 ## Google Media Generation
 See skill: `google-media-gen` — Imagen 4, Veo 2/3 (audio), image-to-video, full Python examples.
+
+## Google Calendar (gog)
+
+### Create event
+```bash
+gog calendar create primary \
+  --account papperpictures@gmail.com \
+  --summary "Event title" \
+  --from "2026-02-20T13:00:00+01:00" \
+  --to "2026-02-20T14:00:00+01:00" \
+  --location "Location" \
+  --description "Description" \
+  --reminder "popup:30m"
+```
+
+### List events
+```bash
+gog calendar events --account papperpictures@gmail.com --today
+gog calendar events --account papperpictures@gmail.com --tomorrow
+gog calendar events --account papperpictures@gmail.com --days 7
+```
+
+### Search events
+```bash
+gog calendar search "query" --account papperpictures@gmail.com
+```
+
+## Gmail Router (CRITICAL)
+**Location:** `/home/papperpictures/.openclaw/workspace/scripts/email/gmail-multi-router.js`
+**Systemd:** `~/.config/systemd/user/gmail-router.service`
+
+**MUST have this environment variable:**
+```
+Environment="GOG_KEYRING_PASSWORD=openclaw"
+```
+
+Without it, gog cannot access OAuth tokens in non-TTY mode and the router fails silently.
+
+**Verify working:**
+```bash
+systemctl --user status gmail-router
+tail /tmp/gmail-router.log
+```
+
+If you see "no TTY available for keyring" errors, the password is missing.
+
+## Custom Chat Commands
+
+| Command | Action | Script |
+|---------|--------|--------|
+| `/lsmodels` | List all available models with aliases | `node /home/papperpictures/.openclaw/workspace/scripts/list-models.js` |
+
+When a user types `/lsmodels` in chat, run the script above and send the output as the reply.
+
+## Code Graph (Live — Feb 22, 2026)
+
+The code graph is **fully operational** with 11,008 nodes, 16,735 edges, and 100% embedding coverage across all repos.
+
+### Database Tables (already created and populated)
+- `code_nodes` — 11,008 entries (functions, files, classes, modules, types, interfaces, methods, config_keys)
+- `code_edges` — 16,735 entries (imports, defines, exports, contains, extends, implements)
+- `code_graph_status` — tracks which chunks have been processed
+
+### CLI: `nimbus code-graph`
+```bash
+nimbus code-graph extract [--repo X] [--force]   # regex extraction from code_chunks
+nimbus code-graph resolve                          # cross-file import resolution
+nimbus code-graph embed [--limit N]                # generate Gemini embeddings
+nimbus code-graph stats                            # print graph statistics
+nimbus code-graph query <name>                     # quick node lookup
+nimbus code-graph reset                            # truncate all code graph tables
+nimbus index-all                                   # full pipeline: index + extract + resolve + embed
+```
+
+### Post-Commit Hooks
+Installed in all 7 GitHub repos on studiokallos. On every commit, automatically runs: index → extract → resolve → embed (background, logs to /tmp/openclaw-post-commit.log).
+
+### Scripts Location
+All code-graph scripts are in the **main workspace**: `/home/papperpictures/.openclaw/workspace/scripts/code-graph/`
+
+### Do NOT re-initialize
+Tables exist and are populated. Do not run CREATE TABLE or initialization — it will fail or wipe data.
+
+
+## Voice MCP on Mac Studio
+See skill: `voice-mcp-mac` — speak on Mac speakers, generate audio, STT from mic, port 18792.
+
+## Google Meet
+See skill: `google-meet` — create/join/admit/leave meetings, SSH commands, GUI session notes.
