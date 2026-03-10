@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Web Audio Capture POC</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .content {
+      padding: 32px;
+    }
+
+    .step {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .step h2 {
+      color: #333;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .step p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-secondary {
+      background: #6c757d;
+    }
+
+    .button-secondary:hover {
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .status.info {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .transcription {
+      margin-top: 16px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 8px;
+      min-height: 60px;
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .transcription::before {
+      content: 'Transcription:';
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .whatsapp-link {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 24px;
+      background: #25D366;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .whatsapp-link:hover {
+      background: #1ebc57;
+    }
+
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+
+    .code-block .keyword {
+      color: #f92672;
+    }
+
+    .code-block .function {
+      color: #a6e22e;
+    }
+
+    .code-block .string {
+      color: #e6db74;
+    }
+
+    .code-block .comment {
+      color: #75715e;
+    }
+
+    .transcript-live {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f0f0f0;
+      border-radius: 12px;
+    }
+
+    .transcript-live h3 {
+      color: #333;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .transcript-live .live-indicator {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #ff4444;
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .transcript-live .transcript-text {
+      font-family: monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 80px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎧 WhatsApp Web Audio Capture</h1>
+      <p>Real-time transcription using getDisplayMedia() + Gemini STT</p>
+    </div>
+
+    <div class="content">
+      <!-- Step 1: Start Capture -->
+      <div class="step">
+        <h2>1. Start Audio Capture</h2>
+        <p>Click the button below to request screen sharing. This will capture system audio (not just microphone).</p>
+        <button id="startCaptureBtn" class="button">🎙️ Start Audio Capture</button>
+        <div id="captureStatus" class="status"></div>
+      </div>
+
+      <!-- Step 2: WhatsApp Web -->
+      <div class="step">
+        <h2>2. Open WhatsApp Web</h2>
+        <p>Make a call in WhatsApp Web and let me capture the audio.</p>
+        <a href="https://web.whatsapp.com" target="_blank" class="whatsapp-link">📱 Open WhatsApp Web</a>
+        <div class="code-block">
+<span class="comment">// Or paste this in your browser console:</span>
+<span class="keyword">const</span> mediaStream = <span class="keyword">await</span> navigator.mediaDevices.getDisplayMedia({
+  video: <span class="keyword">true</span>,
+  audio: <span class="keyword">true</span>,
+  videoConstraints: {
+    displaySurface: <span class="string">'monitor'</span>,
+    preferCurrentTab: <span class="keyword">true</span>
+  }
+});
+        </div>
+      </div>
+
+      <!-- Step 3: Transcribe -->
+      <div class="step">
+        <h2>3. Transcribe Audio</h2>
+        <p>Once audio is captured, it will be sent to Gemini STT for transcription.</p>
+        <button id="transcribeBtn" class="button button-secondary" disabled>📝 Transcribe Current Audio</button>
+        <div id="transcription" class="transcription"></div>
+      </div>
+
+      <!-- Live Transcript -->
+      <div class="transcript-live">
+        <h3><span class="live-indicator">🔴 LIVE</span> Real-time Transcript</h3>
+        <div id="liveTranscript" class="transcript-text">Waiting for audio capture...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let mediaStream = null;
+    let audioContext = null;
+    let sourceNode = null;
+    let destinationNode = null;
+    let transcriptionInterval = null;
+
+    const startCaptureBtn = document.getElementById('startCaptureBtn');
+    const captureStatus = document.getElementById('captureStatus');
+    const transcribeBtn = document.getElementById('transcribeBtn');
+    const transcription = document.getElementById('transcription');
+    const liveTranscript = document.getElementById('liveTranscript');
+
+    // Start audio capture
+    startCaptureBtn.addEventListener('click', async () => {
+      try {
+        captureStatus.className = 'status info';
+        captureStatus.textContent = 'Requesting screen sharing...';
+
+        // Request screen sharing with audio
+        mediaStream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            displaySurface: 'monitor',
+            preferCurrentTab: true
+          },
+          audio: true,
+          videoConstraints: {
+            displaySurface: 'monitor',
+            preferCurrentTab: true
+          }
+        });
+
+        // Hide the video track (we only want audio)
+        const videoTrack = mediaStream.getVideoTracks()[0];
+        if (videoTrack) {
+          videoTrack.enabled = false;
+        }
+
+        // Setup audio processing
+        audioContext = new AudioContext({ sampleRate: 16000 });
+        sourceNode = audioContext.createMediaStreamSource(mediaStream);
+        destinationNode = audioContext.createMediaStreamDestination();
+
+        sourceNode.connect(destinationNode);
+
+        // Setup transcription
+        setupTranscription();
+
+        captureStatus.className = 'status success';
+        captureStatus.textContent = `✓ Audio capture started! ${mediaStream.getAudioTracks().length} audio track(s)`;
+        transcribeBtn.disabled = false;
+        startCaptureBtn.disabled = true;
+
+        console.log('MediaStream:', mediaStream);
+        console.log('Audio tracks:', mediaStream.getAudioTracks());
+        console.log('Audio context sample rate:', audioContext.sampleRate);
+
+      } catch (err) {
+        captureStatus.className = 'status error';
+        captureStatus.textContent = `✗ Error: ${err.message}`;
+        console.error('Error starting capture:', err);
+      }
+    });
+
+    // Setup real-time transcription
+    function setupTranscription() {
+      if (transcriptionInterval) {
+        clearInterval(transcriptionInterval);
+      }
+
+      transcriptionInterval = setInterval(async () => {
+        try {
+          const audioData = await captureAudioChunk(destinationNode.stream.getAudioTracks()[0]);
+          if (audioData && audioData.length > 0) {
+            const transcription = await transcribeAudio(audioData);
+            if (transcription) {
+              liveTranscript.textContent = transcription;
+              transcription.textContent = transcription;
+            }
+          }
+        } catch (err) {
+          console.error('Transcription error:', err);
+        }
+      }, 1000); // Transcribe every second
+    }
+
+    // Capture a chunk of audio
+    function captureAudioChunk(audioTrack) {
+      return new Promise((resolve) => {
+        const offlineContext = new OfflineAudioContext(
+          audioTrack.channelCount,
+          audioTrack.sampleRate,
+          audioTrack.sampleRate
+        );
+
+        const source = offlineContext.createMediaStreamSource([audioTrack]);
+        const destination = offlineContext.createMediaStreamDestination();
+
+        source.connect(destination);
+        source.connect(offlineContext.destination);
+
+        offlineContext.startRendering().then((buffer) => {
+          const audioData = buffer.getChannelData(0);
+          resolve(audioData);
+        });
+      });
+    }
+
+    // Transcribe audio using Gemini STT
+    async function transcribeAudio(audioData) {
+      // Convert to WAV
+      const wavBuffer = audioToWav(audioData);
+
+      // Send to Gemini API
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?key=YOUR_GOOGLE_API_KEY',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{
+                inline_data: {
+                  mime_type: 'audio/wav',
+                  data: wavBuffer.toString('base64')
+                }
+              }]
+            }],
+            generation_config: {
+              max_tokens: 256
+            }
+          })
+        }
+      );
+
+      const data = await response.json();
+      return data.contents[0]?.parts[0]?.text || '';
+    }
+
+    // Convert audio to WAV format
+    function audioToWav(audioData, sampleRate = 16000) {
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const byteRate = sampleRate * numChannels * bitsPerSample / 8;
+      const blockAlign = numChannels * bitsPerSample / 8;
+      const dataSize = audioData.length * numChannels * bitsPerSample / 8;
+      const bufferSize = 44 + dataSize;
+
+      const buffer = new ArrayBuffer(bufferSize);
+      const view = new DataView(buffer);
+
+      // WAV header
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, bufferSize - 8, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      // Audio data
+      const floatTo16BitPCM = (input) => {
+        const output = new Int16Array(input.length);
+        for (let i = 0; i < input.length; i++) {
+          const s = Math.max(-1, Math.min(1, input[i]));
+          output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return output;
+      };
+
+      const pcmData = floatTo16BitPCM(audioData);
+
+      let offset = 44;
+      for (let i = 0; i < pcmData.length; i++) {
+        view.setInt16(offset, pcmData[i], true);
+        offset += 2;
+      }
+
+      return buffer;
+    }
+
+    function writeString(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+      if (transcriptionInterval) {
+        clearInterval(transcriptionInterval);
+      }
+    });
+  </script>
+</body>
+</html>
