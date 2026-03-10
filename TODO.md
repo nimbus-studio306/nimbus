@@ -104,11 +104,12 @@
 
 ### 🎙️ Real-Time Audio Transcription
 - [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
-- [ ] Research real-time transcription for WhatsApp calls
-- [ ] Need raw digital audio capture, not microphone recording
-- [ ] Explore browser audio capture APIs
-- [ ] Explore system audio routing solutions (BlackHole on Mac, etc.)
-- [ ] Integration with Gemini or other STT for live transcription
+- [x] Research real-time transcription for WhatsApp calls → memory/knowledge/research-whatsapp-call-transcription.md (9.6KB, browser + desktop solutions)
+- [x] Documented audio capture challenges (raw digital vs mic recording)
+- [x] Researched browser audio capture APIs (getDisplayMedia)
+- [x] Researched system audio routing solutions (BlackHole, WASAPI, PipeWire)
+- [x] Planned architecture: Phase 1 (browser POC) → Phase 2 (desktop production)
+- [ ] **NEXT**: Implement browser-based POC for WhatsApp Web
 
 ## Priority 3: Security & Infrastructure
 
