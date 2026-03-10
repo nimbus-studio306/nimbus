@@ -96,11 +96,12 @@
   - **DONE**: Draft created at `memory/knowledge/EMAIL-PROFILES.md` — awaiting Zsolt's review
 - [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
 - [x] Account configuration module → memory/knowledge/gmail-account-config.js ✅
-- [ ] **NEW**: Create gmail-search-v2.js with multi-account support
-- [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
-- [ ] Review and finalize EMAIL-PROFILES.md with Zsolt
+- [x] Gmail multi-account tool created → gmail-search-v2.js ✅
+- [x] EMAIL-PROFILES.md draft completed → awaiting Zsolt's review and input
+- [ ] **NEXT**: Review and finalize EMAIL-PROFILES.md with Zsolt (answer 7 open questions)
 - [ ] Define clear routing rules for automatic account selection
 - [ ] Update Gmail router (gmail-multi-router.js) to support multi-account
+- [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
 
 ### 🎙️ Real-Time Audio Transcription
 - [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
@@ -112,8 +113,13 @@
 - [x] **DONE**: Created Node.js simulation script (browser-audio-capture.js)
 - [x] **DONE**: Created browser HTML file with getDisplayMedia() implementation (browser-audio-capture.html)
 - [x] **DONE**: Implemented WAV conversion, STT integration structure
+- [x] **DONE**: Research audio latency optimization → memory/knowledge/optimize-audio-latency.md (11.4KB)
+  - 3 optimization strategies documented (chunk size, streaming, processing pipeline)
+  - 3-phase implementation plan defined (500ms → 200ms → 100ms)
+  - Testing methodology and metrics defined
+  - Expected results: 355ms → 100ms latency
 - [ ] **NEXT**: Test with actual WhatsApp Web call
-- [ ] **NEXT**: Optimize audio capture latency (target <100ms)
+- [ ] **NEXT**: Implement Phase 1 latency optimization (500ms chunks)
 - [ ] **NEXT**: Build real-time transcription UI with live display
 
 ## Priority 3: Security & Infrastructure

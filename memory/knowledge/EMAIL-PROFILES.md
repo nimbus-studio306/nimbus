@@ -191,9 +191,39 @@ What is this email about?
 - All accounts configured in `gog` CLI for multi-account access
 - OAuth2 refresh tokens may expire — re-authorization needed periodically
 - Signatures are NOT automatically appended by Gmail API — must be manually added
-- See `/home/papperpictures/.openclaw/workspace/email-signatures.json` for full signature list
+- Email profiles: `memory/knowledge/gmail-account-config.js` contains account metadata
+- **New tool available:** `gmail-search-v2.js` — multi-account Gmail API tool with CLI interface
+- **Status:** Awaiting Zsolt's review and input on open questions below
 
 ---
 
-*Last updated: 2026-02-25*
+*Last updated: 2026-03-10*
 *Next step: Review with Zsolt and fill in open questions*
+
+---
+
+## Summary for Zsolt
+
+**What this document is:**
+- Guide for when to use each Gmail account
+- Signatures and tone for each account
+- Decision flowchart for account selection
+
+**Current status:**
+- ✅ Draft completed with all 5 accounts documented
+- ✅ Decision flowchart created
+- ✅ 7 open questions prepared for your input
+- ✅ Gmail multi-account tool created (`gmail-search-v2.js`)
+
+**Next steps:**
+1. Review each account profile
+2. Answer the 7 open questions
+3. Let me know if any profiles need adjustment
+4. I'll implement automatic account selection rules based on your preferences
+
+**Key decisions needed:**
+- Which accounts have different response time SLAs?
+- Auto-responders/Out-of-office for each account?
+- Archive vs delete retention policies?
+- Signature variations (e.g., new inquiry vs. ongoing thread)?
+- Tone calibration adjustments?

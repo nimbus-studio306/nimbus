@@ -1,14 +1,30 @@
 # SESSIONS.md — Active Sessions
 
-Last updated: 2026-03-10 13:03 UTC
+Last updated: 2026-03-10 22:15 UTC
 
 ## Recent Work
-- **2026-03-10**: Heartbeat check + Wim Havens reminder
+- **2026-03-10**: Email-PROFILES.md review preparation
+  - Updated EMAIL-PROFILES.md with comprehensive summary for Zsolt
+  - Added 7 open questions for account selection guidelines
+  - Documented current status (draft complete, awaiting input)
+  - Updated TODO.md to clarify next step
   - **URGENT REMINDER**: Wim Havens artwork delivery deadline — Friday, March 11th (2 days away)
   - Verified db-watcher is running (PID 3091212)
   - Updated SESSIONS.md timestamp
   - Identified TODO.md discrepancies: several Gmail multi-account tasks marked complete but scripts don't exist
   - Created daily memory file: memory/2026-03-10.md
+- **2026-03-10**: Audio latency optimization research
+  - Created `memory/knowledge/optimize-audio-latency.md` (11.4KB)
+  - Documented 3 optimization strategies:
+    - **Strategy 1:** Smaller audio chunks (100ms → 300ms latency)
+    - **Strategy 2:** Streaming API integration (100ms latency target)
+    - **Strategy 3:** Audio processing pipeline optimization (OfflineAudioContext)
+  - Defined 3-phase implementation plan:
+    - Phase 1: 500ms chunks (300ms latency)
+    - Phase 2: Optimized processing (200ms latency)
+    - Phase 3: Streaming API (100ms latency)
+  - Defined testing methodology and metrics
+  - Updated TODO.md to reflect research completion
 - **2026-02-26**: Heartbeat maintenance + Calendar write-access unblock
   - Verified db-watcher is running (`db-watcher.py`, PID 131918)
   - Ran calendar write test script and fixed request serialization bug in `scripts/meet/test-calendar-write.js`
