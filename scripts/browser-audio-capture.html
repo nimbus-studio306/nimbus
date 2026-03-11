@@ -356,7 +356,7 @@
         } catch (err) {
           console.error('Transcription error:', err);
         }
-      }, 1000); // Transcribe every second
+      }, 500); // Transcribe every 500ms (optimized from 1000ms)
     }
 
     // Capture a chunk of audio

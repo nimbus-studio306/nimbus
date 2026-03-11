@@ -127,12 +127,12 @@ async function simulateBrowserCapture() {
   console.log('\n--- Step 1: Capture Audio (simulated) ---\n');
 
   // Simulate audio capture (in real implementation, this would come from getDisplayMedia)
-  const audioData = Buffer.alloc(16000 * 2); // 1 second of audio, 16kHz, 16-bit
+  const audioData = Buffer.alloc(8000 * 2); // 500ms of audio, 16kHz, 16-bit (OPTIMIZED)
   for (let i = 0; i < audioData.length; i++) {
     audioData[i] = Math.floor(Math.random() * 256);
   }
 
-  console.log(`✓ Captured ${audioData.length} bytes of audio (1 second @ 16kHz, 16-bit)`);
+  console.log(`✓ Captured ${audioData.length} bytes of audio (500ms @ 16kHz, 16-bit)`);
   console.log(`✓ Audio format: ${audioData.length} bytes = ${(audioData.length / 16000 / 2).toFixed(3)} seconds`);
 
   console.log('\n--- Step 2: Convert to WAV ---\n');
