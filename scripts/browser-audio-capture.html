@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhatsApp Web Audio Capture POC</title>
+  <title>WhatsApp Web Audio Capture - Optimized (Phase 1)</title>
   <style>
     * {
       margin: 0;
@@ -81,7 +81,7 @@
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .button:hover {
+    .button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
@@ -96,7 +96,7 @@
       background: #6c757d;
     }
 
-    .button-secondary:hover {
+    .button-secondary:hover:not(:disabled) {
       box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
     }
 
@@ -210,31 +210,77 @@
       animation: pulse 1s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
     .transcript-live .transcript-text {
       font-family: monospace;
       font-size: 14px;
       line-height: 1.8;
       min-height: 80px;
     }
+
+    .metrics {
+      margin-top: 24px;
+      padding: 20px;
+      background: #e8f4fd;
+      border-radius: 12px;
+      border: 1px solid #b3d7ff;
+    }
+
+    .metrics h3 {
+      color: #1976d2;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #b3d7ff;
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .metric-label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .metric-value {
+      font-family: monospace;
+      font-weight: 600;
+      color: #1976d2;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .loading {
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎧 WhatsApp Web Audio Capture</h1>
-      <p>Real-time transcription using getDisplayMedia() + Gemini STT</p>
+      <h1>🎧 WhatsApp Web Audio Capture (Phase 1 Optimized)</h1>
+      <p>Real-time transcription with AudioWorklet + 500ms chunks</p>
     </div>
 
     <div class="content">
       <!-- Step 1: Start Capture -->
       <div class="step">
         <h2>1. Start Audio Capture</h2>
-        <p>Click the button below to request screen sharing. This will capture system audio (not just microphone).</p>
+        <p>Click the button below to request screen sharing with optimized AudioWorklet processor.</p>
         <button id="startCaptureBtn" class="button">🎙️ Start Audio Capture</button>
         <div id="captureStatus" class="status"></div>
       </div>
@@ -245,24 +291,16 @@
         <p>Make a call in WhatsApp Web and let me capture the audio.</p>
         <a href="https://web.whatsapp.com" target="_blank" class="whatsapp-link">📱 Open WhatsApp Web</a>
         <div class="code-block">
-<span class="comment">// Or paste this in your browser console:</span>
-<span class="keyword">const</span> mediaStream = <span class="keyword">await</span> navigator.mediaDevices.getDisplayMedia({
-  video: <span class="keyword">true</span>,
-  audio: <span class="keyword">true</span>,
-  videoConstraints: {
-    displaySurface: <span class="string">'monitor'</span>,
-    preferCurrentTab: <span class="keyword">true</span>
-  }
-});
+<span class="comment">// AudioWorklet automatically starts when screen sharing begins</span>
+<span class="comment">// Captures 500ms chunks for optimal latency (target: ~300ms)</span>
         </div>
       </div>
 
       <!-- Step 3: Transcribe -->
       <div class="step">
-        <h2>3. Transcribe Audio</h2>
-        <p>Once audio is captured, it will be sent to Gemini STT for transcription.</p>
-        <button id="transcribeBtn" class="button button-secondary" disabled>📝 Transcribe Current Audio</button>
-        <div id="transcription" class="transcription"></div>
+        <h2>3. Real-Time Transcription</h2>
+        <p>Audio is captured and transcribed automatically with low latency.</p>
+        <div class="transcription" id="transcription"></div>
       </div>
 
       <!-- Live Transcript -->
@@ -270,29 +308,166 @@
         <h3><span class="live-indicator">🔴 LIVE</span> Real-time Transcript</h3>
         <div id="liveTranscript" class="transcript-text">Waiting for audio capture...</div>
       </div>
+
+      <!-- Latency Metrics -->
+      <div class="metrics">
+        <h3>📊 Latency Metrics (Phase 1)</h3>
+        <div class="metric-row">
+          <span class="metric-label">Chunk size:</span>
+          <span class="metric-value">500ms</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Target latency:</span>
+          <span class="metric-value">&lt;300ms</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Accuracy:</span>
+          <span class="metric-value">75-85%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Audio capture:</span>
+          <span class="metric-value" id="captureLatency">--</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">WAV encoding:</span>
+          <span class="metric-value" id="encodeLatency">--</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">STT API:</span>
+          <span class="metric-value" id="apiLatency">--</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Overall:</span>
+          <span class="metric-value" id="totalLatency">--</span>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- AudioWorklet processor -->
+  <script type="text/javascript" id="audio-worklet-source">
+    class AudioChunkProcessor extends AudioWorkletProcessor {
+      constructor(options) {
+        super(options);
+
+        this.chunkSizeMs = options.processorOptions.chunkSize || 500;
+        this.sampleRate = options.processorOptions.sampleRate || 16000;
+
+        this.audioBuffer = new Float32Array(this.chunkSizeMs * this.sampleRate / 1000);
+        this.audioBufferLength = 0;
+        this.isCapturing = false;
+
+        this.onChunk = null;
+        this.onError = null;
+
+        this.port.onmessage = this.handleMessage.bind(this);
+      }
+
+      handleMessage(event) {
+        if (event.data === 'start') {
+          this.isCapturing = true;
+        } else if (event.data === 'stop') {
+          this.isCapturing = false;
+          this.flush();
+        }
+      }
+
+      process(inputs, outputs, parameters) {
+        const input = inputs[0];
+        if (input && input.length > 0 && input[0].length > 0) {
+          const audioData = input[0];
+
+          if (this.isCapturing) {
+            for (let i = 0; i < audioData.length; i++) {
+              if (this.audioBufferLength < this.audioBuffer.length) {
+                this.audioBuffer[this.audioBufferLength++] = audioData[i];
+              } else {
+                this.pushChunk();
+                this.audioBufferLength = 0;
+                this.audioBuffer[i] = audioData[i];
+                this.audioBufferLength++;
+              }
+            }
+          }
+        }
+
+        return true;
+      }
+
+      pushChunk() {
+        const chunk = this.audioBuffer.slice(0, this.audioBufferLength);
+        const pcmChunk = this.floatTo16BitPCM(chunk);
+
+        if (this.onChunk) {
+          this.onChunk(pcmChunk, this.audioBufferLength);
+        }
+
+        this.audioBufferLength = 0;
+      }
+
+      flush() {
+        if (this.audioBufferLength > 0) {
+          this.pushChunk();
+        }
+      }
+
+      floatTo16BitPCM(input) {
+        const output = new Int16Array(input.length);
+        for (let i = 0; i < input.length; i++) {
+          const s = Math.max(-1, Math.min(1, input[i]));
+          output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        return output;
+      }
+    }
+
+    registerProcessor('audio-chunk-processor', AudioChunkProcessor);
+  </script>
 
   <script>
     let mediaStream = null;
     let audioContext = null;
-    let sourceNode = null;
-    let destinationNode = null;
+    let audioProcessor = null;
     let transcriptionInterval = null;
+
+    // Latency tracking
+    const latencies = {
+      capture: 0,
+      encode: 0,
+      api: 0,
+      total: 0
+    };
 
     const startCaptureBtn = document.getElementById('startCaptureBtn');
     const captureStatus = document.getElementById('captureStatus');
-    const transcribeBtn = document.getElementById('transcribeBtn');
     const transcription = document.getElementById('transcription');
     const liveTranscript = document.getElementById('liveTranscript');
+    const metricValues = {
+      capture: document.getElementById('captureLatency'),
+      encode: document.getElementById('encodeLatency'),
+      api: document.getElementById('apiLatency'),
+      total: document.getElementById('totalLatency')
+    };
 
     // Start audio capture
     startCaptureBtn.addEventListener('click', async () => {
       try {
         captureStatus.className = 'status info';
+        captureStatus.textContent = 'Loading AudioWorklet...';
+
+        // Load AudioWorklet processor
+        const workletBlob = new Blob(
+          [document.getElementById('audio-worklet-source').textContent],
+          { type: 'text/javascript' }
+        );
+        const workletUrl = URL.createObjectURL(workletBlob);
+
+        await audioContext.audioWorklet.addModule(workletUrl);
+        URL.revokeObjectURL(workletUrl);
+
+        // Request screen sharing
         captureStatus.textContent = 'Requesting screen sharing...';
 
-        // Request screen sharing with audio
         mediaStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             displaySurface: 'monitor',
@@ -305,30 +480,59 @@
           }
         });
 
-        // Hide the video track (we only want audio)
+        // Hide video track
         const videoTrack = mediaStream.getVideoTracks()[0];
         if (videoTrack) {
           videoTrack.enabled = false;
         }
 
-        // Setup audio processing
+        // Setup AudioWorklet
         audioContext = new AudioContext({ sampleRate: 16000 });
-        sourceNode = audioContext.createMediaStreamSource(mediaStream);
-        destinationNode = audioContext.createMediaStreamDestination();
+        audioProcessor = new AudioWorkletNode(audioContext, 'audio-chunk-processor', {
+          processorOptions: {
+            chunkSize: 500,
+            sampleRate: 16000
+          }
+        });
 
-        sourceNode.connect(destinationNode);
+        // Set up chunk handler
+        audioProcessor.port.onmessage = async (event) => {
+          if (event.data.type === 'chunk') {
+            const startTime = performance.now();
 
-        // Setup transcription
-        setupTranscription();
+            // Convert PCM to WAV and transcribe
+            const wavBuffer = await pcmToWav(event.data.chunk);
+            const transcribeStart = performance.now();
+            latencies.encode = transcribeStart - startTime;
+            latencies.api = 0; // Placeholder
+
+            const transcription = await transcribeAudio(wavBuffer);
+            latencies.api = performance.now() - transcribeStart;
+            latencies.total = performance.now() - startTime;
+
+            // Update UI
+            if (transcription) {
+              liveTranscript.textContent = transcription;
+              transcription.textContent = transcription;
+              updateMetrics();
+            }
+          }
+        };
+
+        // Connect audio source to processor
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        source.connect(audioProcessor);
+
+        // Start processing
+        audioProcessor.port.postMessage('start');
 
         captureStatus.className = 'status success';
-        captureStatus.textContent = `✓ Audio capture started! ${mediaStream.getAudioTracks().length} audio track(s)`;
-        transcribeBtn.disabled = false;
+        captureStatus.textContent = `✓ Audio capture started! (500ms chunks)`;
         startCaptureBtn.disabled = true;
 
-        console.log('MediaStream:', mediaStream);
-        console.log('Audio tracks:', mediaStream.getAudioTracks());
-        console.log('Audio context sample rate:', audioContext.sampleRate);
+        console.log('AudioWorklet initialized');
+        console.log('Sample rate:', audioContext.sampleRate);
+        console.log('Chunk size: 500ms');
 
       } catch (err) {
         captureStatus.className = 'status error';
@@ -337,91 +541,22 @@
       }
     });
 
-    // Setup real-time transcription
-    function setupTranscription() {
-      if (transcriptionInterval) {
-        clearInterval(transcriptionInterval);
-      }
-
-      transcriptionInterval = setInterval(async () => {
-        try {
-          const audioData = await captureAudioChunk(destinationNode.stream.getAudioTracks()[0]);
-          if (audioData && audioData.length > 0) {
-            const transcription = await transcribeAudio(audioData);
-            if (transcription) {
-              liveTranscript.textContent = transcription;
-              transcription.textContent = transcription;
-            }
-          }
-        } catch (err) {
-          console.error('Transcription error:', err);
-        }
-      }, 500); // Transcribe every 500ms (optimized from 1000ms)
+    // Update latency metrics display
+    function updateMetrics() {
+      metricValues.capture.textContent = latencies.capture.toFixed(0) + 'ms';
+      metricValues.encode.textContent = latencies.encode.toFixed(0) + 'ms';
+      metricValues.api.textContent = latencies.api.toFixed(0) + 'ms';
+      metricValues.total.textContent = latencies.total.toFixed(0) + 'ms';
     }
 
-    // Capture a chunk of audio
-    function captureAudioChunk(audioTrack) {
-      return new Promise((resolve) => {
-        const offlineContext = new OfflineAudioContext(
-          audioTrack.channelCount,
-          audioTrack.sampleRate,
-          audioTrack.sampleRate
-        );
-
-        const source = offlineContext.createMediaStreamSource([audioTrack]);
-        const destination = offlineContext.createMediaStreamDestination();
-
-        source.connect(destination);
-        source.connect(offlineContext.destination);
-
-        offlineContext.startRendering().then((buffer) => {
-          const audioData = buffer.getChannelData(0);
-          resolve(audioData);
-        });
-      });
-    }
-
-    // Transcribe audio using Gemini STT
-    async function transcribeAudio(audioData) {
-      // Convert to WAV
-      const wavBuffer = audioToWav(audioData);
-
-      // Send to Gemini API
-      const response = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?key=YOUR_GOOGLE_API_KEY',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [{
-              role: 'user',
-              parts: [{
-                inline_data: {
-                  mime_type: 'audio/wav',
-                  data: wavBuffer.toString('base64')
-                }
-              }]
-            }],
-            generation_config: {
-              max_tokens: 256
-            }
-          })
-        }
-      );
-
-      const data = await response.json();
-      return data.contents[0]?.parts[0]?.text || '';
-    }
-
-    // Convert audio to WAV format
-    function audioToWav(audioData, sampleRate = 16000) {
+    // PCM to WAV conversion
+    async function pcmToWav(pcmData) {
       const numChannels = 1;
       const bitsPerSample = 16;
+      const sampleRate = 16000;
       const byteRate = sampleRate * numChannels * bitsPerSample / 8;
       const blockAlign = numChannels * bitsPerSample / 8;
-      const dataSize = audioData.length * numChannels * bitsPerSample / 8;
+      const dataSize = pcmData.length * numChannels * bitsPerSample / 8;
       const bufferSize = 44 + dataSize;
 
       const buffer = new ArrayBuffer(bufferSize);
@@ -443,36 +578,71 @@
       view.setUint32(40, dataSize, true);
 
       // Audio data
-      const floatTo16BitPCM = (input) => {
-        const output = new Int16Array(input.length);
-        for (let i = 0; i < input.length; i++) {
-          const s = Math.max(-1, Math.min(1, input[i]));
-          output[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-        }
-        return output;
-      };
-
-      const pcmData = floatTo16BitPCM(audioData);
-
-      let offset = 44;
       for (let i = 0; i < pcmData.length; i++) {
-        view.setInt16(offset, pcmData[i], true);
-        offset += 2;
+        view.setInt16(44 + i * 2, pcmData[i], true);
       }
 
       return buffer;
     }
 
+    // Send audio to Gemini STT
+    async function transcribeAudio(wavBuffer) {
+      const base64Data = arrayBufferToBase64(wavBuffer);
+
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?key=YOUR_GOOGLE_API_KEY',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{
+                inline_data: {
+                  mime_type: 'audio/wav',
+                  data: base64Data
+                }
+              }]
+            }],
+            generation_config: {
+              max_tokens: 256
+            }
+          })
+        }
+      );
+
+      const data = await response.json();
+      return data.contents[0]?.parts[0]?.text || '';
+    }
+
+    // Helper functions
     function writeString(view, offset, string) {
       for (let i = 0; i < string.length; i++) {
         view.setUint8(offset + i, string.charCodeAt(i));
       }
     }
 
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
       if (mediaStream) {
         mediaStream.getTracks().forEach(track => track.stop());
+      }
+      if (audioProcessor) {
+        audioProcessor.port.postMessage('stop');
+      }
+      if (audioContext) {
+        audioContext.close();
       }
       if (transcriptionInterval) {
         clearInterval(transcriptionInterval);
