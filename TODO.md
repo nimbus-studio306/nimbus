@@ -123,7 +123,13 @@
   - 3-phase implementation plan defined (500ms → 200ms → 100ms)
   - Testing methodology and metrics defined
   - Expected results: 355ms → 100ms latency
-- [ ] **NEXT**: Test with actual WhatsApp Web call
+- [x] **DONE**: Research WhatsApp call transcription testing → memory/knowledge/whatsapp-call-transcription-test.md (2026-03-12)
+  - 3-phase testing methodology defined
+  - STT integration architecture designed (Google Cloud Speech-to-Text)
+  - Real-time UI design documented
+  - Success metrics and testing script template created
+- [ ] **NEXT**: Test with actual WhatsApp Web call (awaiting Zsolt's approval)
+- [ ] **NEXT**: Implement basic STT integration
 - [ ] **NEXT**: Implement Phase 1 latency optimization (500ms chunks)
 - [ ] **NEXT**: Build real-time transcription UI with live display
 
