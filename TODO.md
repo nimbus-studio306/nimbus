@@ -100,12 +100,12 @@
   - When to use this account
   - **DONE**: Draft created at `memory/knowledge/EMAIL-PROFILES.md` — awaiting Zsolt's review
 - [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
-- [x] Account configuration module → memory/knowledge/gmail-account-config.js ✅
-- [x] Gmail multi-account tool created → gmail-search-v2.js ✅
-- [x] EMAIL-PROFILES.md draft completed → awaiting Zsolt's review and input
+- [x] **DONE**: Detailed implementation plan created → memory/knowledge/gmail-multi-account-implementation.md (2026-03-12)
+- [x] **DONE**: Designed multi-account search tool architecture with aliases and routing rules
 - [ ] **NEXT**: Review and finalize EMAIL-PROFILES.md with Zsolt (answer 7 open questions)
 - [ ] Define clear routing rules for automatic account selection
-- [ ] Update Gmail router (gmail-multi-router.js) to support multi-account
+- [ ] Implement multi-account search tool (gmail-search-v2.js)
+- [ ] Create alias system configuration
 - [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
 
 ### 🎙️ Real-Time Audio Transcription
