@@ -79,10 +79,14 @@
 - [x] Set up Google Calendar OAuth2 authentication → `google-calendar-auth.js` (commit 2ed8114)
 - [x] Read access to Zsolt's calendars (papperpictures@gmail.com) ✅
 - [x] Add write access (create/update/delete events) → fixed `test-calendar-write.js` request body + PATCH update; verified create/update/delete all working (2026-02-26)
-- [ ] Handle multiple Google accounts (need OAuth for additional accounts)
+- [x] **DONE**: Research multiple Google accounts for Calendar → documented in `memory/knowledge/google-calendar-multi-account.md` (2026-03-12)
+- [x] **DONE**: Documented OAuth2 architecture with per-account token storage
+- [x] **DONE**: Created implementation plan with code examples and decision matrix
+- [ ] Handle multiple Google accounts (need OAuth for additional accounts) - **AWAITING DECISION**
 - [x] **DONE**: Research iCloud calendar sync with Google Calendar → documented in `memory/knowledge/icloud-google-calendar-sync.md` (2026-03-12)
 - [x] **DONE**: Documented all sync approaches and decision matrix (scripted vs third-party vs hybrid)
 - [ ] Implement iCloud → Google sync (pending Zsolt's decision on approach)
+- [ ] Ability to schedule meetings and events
 
 ### 📧 Multiple Gmail Account Management
 - [x] Gmail read access via OAuth2 (papperpictures@gmail.com) → `gmail-search.js` ✅
