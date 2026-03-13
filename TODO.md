@@ -91,8 +91,8 @@
 ### 📧 Multiple Gmail Account Management
 - [x] Gmail read access via OAuth2 (papperpictures@gmail.com) → `gmail-search.js` ✅
 - [x] Gmail Pub/Sub notifications working (real-time email alerts) ✅
-- [x] OAuth2 setup for additional accounts (~5 Gmail accounts total) → **IN PROGRESS**: Creating `gmail-search-v2.js`
-- [x] Alias system for easy reference (e.g. "personal", "studio", "business") → accounts/aliases configured ✅
+- [x] OAuth2 setup for additional accounts (~5 Gmail accounts total) → **DONE**: Multi-account implementation complete (2026-03-13)
+- [x] Alias system for easy reference (e.g. "personal", "studio", "business") → lib/gmail-alias-resolver.js ✅
 - [x] Create EMAIL-PROFILES.md document specifying for each account:
   - How to sign/name (which name to use)
   - Signature format
@@ -102,11 +102,13 @@
 - [x] Gmail multi-account research and architecture → memory/knowledge/gmail-multi-account-research.md ✅
 - [x] **DONE**: Detailed implementation plan created → memory/knowledge/gmail-multi-account-implementation.md (2026-03-12)
 - [x] **DONE**: Designed multi-account search tool architecture with aliases and routing rules
+- [x] **DONE**: Implemented multi-account search tool (gmail-search-v2.js) - commit 1375e6e
+- [x] **DONE**: Created alias system configuration (lib/gmail-alias-resolver.js)
+- [x] **DONE**: Created routing rules system (lib/gmail-routing-rules.js)
+- [x] **DONE**: Created OAuth helper module (lib/gmail-multi-account-oauth.js)
 - [ ] **NEXT**: Review and finalize EMAIL-PROFILES.md with Zsolt (answer 7 open questions)
-- [ ] Define clear routing rules for automatic account selection
-- [ ] Implement multi-account search tool (gmail-search-v2.js)
-- [ ] Create alias system configuration
-- [ ] Test with at least one additional account (urbandanceteam) — requires OAuth flow
+- [ ] **NEXT**: Run OAuth flow for each account (requires manual authorization)
+- [ ] Test with at least one additional account (urbandanceteam) - requires OAuth flow
 
 ### 🎙️ Real-Time Audio Transcription
 - [x] Research proper real-time transcription for Zoom calls → memory/knowledge/research-realtime-transcription.md (11.7KB, hybrid approach: BlackHole for desktop, getUserMedia for browser)
