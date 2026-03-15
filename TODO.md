@@ -130,10 +130,11 @@
   - STT integration architecture designed (Google Cloud Speech-to-Text)
   - Real-time UI design documented
   - Success metrics and testing script template created
+- [x] **DONE**: Phase 1 implementation complete (500ms chunks) - commit created
+- [x] **DONE**: Browser audio capture test HTML created
+- [x] **DONE**: STT integration script created
 - [ ] **NEXT**: Test with actual WhatsApp Web call (awaiting Zsolt's approval)
-- [ ] **NEXT**: Implement basic STT integration
-- [ ] **NEXT**: Implement Phase 1 latency optimization (500ms chunks)
-- [ ] **NEXT**: Build real-time transcription UI with live display
+- [ ] **NEXT**: Review Phase 1 implementation with Zsolt
 
 ## Priority 3: Security & Infrastructure
 

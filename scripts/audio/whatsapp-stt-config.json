@@ -1,0 +1,22 @@
+{
+  "stt": {
+    "languageCode": "en-US",
+    "sampleRateHertz": 16000,
+    "encoding": "LINEAR16",
+    "interimResults": true,
+    "enableAutomaticPunctuation": true
+  },
+  "audio": {
+    "chunkDurationMs": 500,
+    "minSilenceMs": 250,
+    "maxSilenceMs": 750,
+    "sampleRate": 16000
+  },
+  "ui": {
+    "showTimestamps": true,
+    "showInterim": true,
+    "showFinal": true,
+    "colorFinal": "green",
+    "colorInterim": "cyan"
+  }
+}

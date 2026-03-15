@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Audio Capture Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #128C7E;
+      margin-top: 0;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    .status.active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .status.recording {
+      background: #fee2e2;
+      color: #991b1b;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #128C7E;
+    }
+    .stat-label {
+      color: #666;
+      font-size: 14px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    button.primary {
+      background: #128C7E;
+      color: white;
+    }
+    button.primary:hover {
+      background: #075e54;
+    }
+    button.secondary {
+      background: #e9edef;
+      color: #667781;
+    }
+    button.secondary:hover {
+      background: #d1d7db;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .log-entry {
+      margin: 5px 0;
+    }
+    .log-entry.error {
+      color: #ff6b6b;
+    }
+    .log-entry.success {
+      color: #51cf66;
+    }
+    .log-entry.info {
+      color: #339af0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎤 WhatsApp Audio Capture Test</h1>
+
+    <div id="status" class="status">Click "Start" to begin audio capture</div>
+
+    <div class="stats" id="stats" style="display: none;">
+      <div class="stat">
+        <div class="stat-value" id="chunkCount">0</div>
+        <div class="stat-label">Chunks Captured</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="duration">0s</div>
+        <div class="stat-label">Duration</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="primary" onclick="startCapture()">▶️ Start Capture</button>
+      <button id="stopBtn" class="secondary" onclick="stopCapture()" disabled>⏹️ Stop</button>
+      <button id="clearBtn" class="secondary" onclick="clearLog()">🗑️ Clear Log</button>
+    </div>
+
+    <h2>📋 Audio Stream Data</h2>
+    <div id="log" class="log">Waiting to start...</div>
+  </div>
+
+  <script>
+    let audioStream = null;
+    let audioContext = null;
+    let scriptProcessor = null;
+    let source = null;
+    let isRecording = false;
+    let startTime = null;
+    let chunkCount = 0;
+    let animationFrame = null;
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    async function startCapture() {
+      try {
+        document.getElementById('status').className = 'status recording';
+        document.getElementById('status').textContent = '🎙️ Capturing audio...';
+
+        // Request screen/audio share via browser
+        audioStream = await navigator.mediaDevices.getDisplayMedia({
+          video: false,
+          audio: true
+        });
+
+        log('✅ Audio stream acquired', 'success');
+
+        // Create audio context
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({
+          sampleRate: 16000
+        });
+
+        source = audioContext.createMediaStreamSource(audioStream);
+        const bufferSize = audioContext.sampleRate * 0.5;  // 500ms chunks
+        scriptProcessor = audioContext.createScriptProcessor(bufferSize, 1, 1);
+
+        let audioData = [];
+        let silenceCount = 0;
+        let lastPeak = 0;
+
+        // Handle audio data
+        scriptProcessor.onaudioprocess = (e) => {
+          if (!isRecording) return;
+
+          const inputData = e.inputBuffer.getChannelData(0);
+          let peak = 0;
+
+          for (let i = 0; i < inputData.length; i++) {
+            peak = Math.max(peak, Math.abs(inputData[i]));
+          }
+
+          // Check for silence
+          if (peak < 0.01) {
+            silenceCount++;
+          } else {
+            silenceCount = 0;
+          }
+
+          // Capture data if not silent or minimum chunks reached
+          if (peak > 0.01 || audioData.length > 0) {
+            audioData.push(Array.from(inputData));
+            chunkCount++;
+            updateStats();
+
+            // Transmit chunk every 500ms or 250ms silence
+            if (audioData.length >= audioContext.sampleRate * 0.5 || silenceCount > 10) {
+              transmitChunk(audioData);
+              audioData = [];
+              silenceCount = 0;
+            }
+          }
+
+          lastPeak = peak;
+        };
+
+        source.connect(scriptProcessor);
+        scriptProcessor.connect(audioContext.destination);
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+          if (e.code === 'Space') {
+            e.preventDefault();
+            if (isRecording) {
+              stopCapture();
+            } else {
+              log('⚠️ Press STOP to end capture', 'info');
+            }
+          }
+        });
+
+        isRecording = true;
+        startTime = Date.now();
+
+        // Update stats every second
+        animationFrame = requestAnimationFrame(updateStatsLoop);
+
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('stats').style.display = 'grid';
+
+        log('✅ Recording started. Press SPACE to pause, STOP to end.', 'success');
+
+      } catch (error) {
+        log(`❌ Error starting capture: ${error.message}`, 'error');
+        document.getElementById('status').className = 'status';
+        document.getElementById('status').textContent = 'Error starting capture';
+      }
+    }
+
+    function transmitChunk(audioData) {
+      if (audioData.length === 0) return;
+
+      // Convert to WAV format
+      const wavData = convertToWav(audioData);
+
+      // Log sample data (first 100 bytes only to avoid flooding)
+      const hex = Array.from(wavData.slice(0, 100))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join(' ');
+
+      log(`📤 Chunk #${chunkCount}: ${wavData.length} bytes (sample: ${hex})`, 'info');
+    }
+
+    function convertToWav(audioData) {
+      const numSamples = audioData.flat().length;
+      const sampleRate = 16000;
+      const byteRate = sampleRate * 2;  // 16-bit = 2 bytes per sample
+      const dataLength = numSamples * 2;
+      const headerLength = 44;
+      const totalLength = headerLength + dataLength;
+
+      const buffer = new ArrayBuffer(totalLength);
+      const view = new DataView(buffer);
+
+      // WAV header
+      const writeString = (offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      };
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, totalLength - 8, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);  // Chunk size
+      view.setUint16(20, 1, true);   // Audio format (PCM)
+      view.setUint16(22, 1, true);   // Channels (mono)
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, 2, true);   // Block alignment
+      view.setUint16(34, 16, true);  // Bits per sample
+      writeString(36, 'data');
+      view.setUint32(40, dataLength, true);
+
+      // Audio data
+      let offset = 44;
+      for (const channelData of audioData) {
+        for (let i = 0; i < channelData.length; i++) {
+          const sample = Math.max(-1, Math.min(1, channelData[i]));
+          const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+          view.setInt16(offset, intSample, true);
+          offset += 2;
+        }
+      }
+
+      return new Uint8Array(buffer);
+    }
+
+    function updateStatsLoop() {
+      if (isRecording) {
+        const duration = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('duration').textContent = duration + 's';
+        animationFrame = requestAnimationFrame(updateStatsLoop);
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('chunkCount').textContent = chunkCount;
+    }
+
+    function stopCapture() {
+      isRecording = false;
+
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+      }
+
+      if (audioContext) {
+        audioContext.close();
+      }
+
+      if (scriptProcessor) {
+        scriptProcessor.disconnect();
+      }
+
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+
+      document.getElementById('status').className = 'status active';
+      document.getElementById('status').textContent = `✅ Capture stopped. Chunks: ${chunkCount}`;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+
+      log(`⏹️ Capture stopped. Total chunks: ${chunkCount}`, 'success');
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+      log('Log cleared', 'info');
+    }
+
+    // Initial message
+    log('📖 Click "Start" to begin audio capture test', 'info');
+  </script>
+</body>
+</html>
